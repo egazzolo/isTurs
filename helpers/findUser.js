@@ -1,30 +1,20 @@
-const jwt = require('jsonwebtoken');
-const Usuario = require('../models/user'); // Asegúrate de que la ruta sea correcta para tu modelo de Mongoose
+const jwt = require('jsonwebtoken')
+const supabase = require('../database/config')
 
 const findUser = async (token) => {
   try {
-    // Verifica el token utilizando tu 'secret' o 'clave' con la que firmaste los JWTs
-    const decoded = jwt.verify(token, process.env.SECRETORPRIVATEKEY);
-
-    // Asumiendo que el ID del usuario está en el payload del token como 'usuarioId'
-    const usuarioId = decoded.uid;
-
-
-    // Buscar el usuario en la base de datos
-    const usuario = await Usuario.findById(usuarioId);
-
-    if (!usuario) {
-      return null; // O manejar como prefieras cuando el usuario no se encuentra
-    }
-
-    return usuario; // Devuelve el usuario encontrado
+    const decoded = jwt.verify(token, process.env.SECRETORPRIVATEKEY)
+    const { data: usuario, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', decoded.uid)
+      .single()
+    if (error || !usuario) return null
+    return usuario
   } catch (error) {
-    console.error(error);
-    throw new Error("Error al verificar el token o buscar el usuario.");
+    console.error(error)
+    throw new Error('Error al verificar el token o buscar el usuario.')
   }
-};
-
-
-module.exports = {
-  findUser
 }
+
+module.exports = { findUser }

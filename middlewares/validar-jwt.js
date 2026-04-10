@@ -1,45 +1,33 @@
 const { response, request } = require('express')
 const jwt = require('jsonwebtoken')
-const Usuario = require('../models/user')
+const supabase = require('../database/config')
 
-const validarJWT = async ( req = request, res = response, next ) => {
-
+const validarJWT = async (req = request, res = response, next) => {
   const token = req.header('access_token')
 
-  if ( !token ) {
-    return res.status(401).json({
-      msg: "No hay token en la petición"
-    })
+  if (!token) {
+    return res.status(401).json({ msg: 'No hay token en la petición' })
   }
 
   try {
+    const { uid } = jwt.verify(token, process.env.SECRETORPRIVATEKEY)
 
-    const { uid } = jwt.verify( token, process.env.SECRETORPRIVATEKEY )
+    const { data: usuario, error } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', uid)
+      .single()
 
-    const usuario = await Usuario.findById( uid )
-
-    if ( !usuario ) {
-      console.log("El usuario no existe en la base de datos")
-      res.status(401).json({
-        msg: "El Usuario no existe"
-      })
+    if (error || !usuario) {
+      return res.status(401).json({ msg: 'El Usuario no existe' })
     }
 
     req.user = usuario
-
     next()
-
   } catch (error) {
-
     console.log(error)
-     res.status(401).json({
-      msg: "Token no válido"
-    })
-
+    res.status(401).json({ msg: 'Token no válido' })
   }
-
 }
 
-module.exports = {
-  validarJWT
-}
+module.exports = { validarJWT }
