@@ -5,6 +5,7 @@ const { generarJWT, verificarJWT } = require('../helpers/generarJWT')
 
 const login = async (req, res = response) => {
   const { username, password } = req.body
+  console.log('Login attempt for username:', username)
 
   try {
     const { data: usuario, error } = await supabase
@@ -13,22 +14,27 @@ const login = async (req, res = response) => {
       .eq('username', username)
       .single()
 
+    console.log('Supabase result:', { usuario: usuario ? 'found' : 'not found', error })
+
     if (error || !usuario) {
-      return res.status(400).json({ msg: 'Usuario / Contraseña no son correctos - Usuario' })
+      return res.status(400).json({ msg: 'Usuario / Contrase\u00f1a no son correctos - Usuario' })
     }
 
     const validPassword = bcryptjs.compareSync(password, usuario.password)
+    console.log('Password valid:', validPassword)
+
     if (!validPassword) {
-      return res.status(400).json({ msg: 'Usuario / Contraseña no son correctos - Password' })
+      return res.status(400).json({ msg: 'Usuario / Contrase\u00f1a no son correctos - Password' })
     }
 
     const token = await generarJWT(usuario.id)
-    const { password: _, ...usuarioSinPassword } = usuario
+    console.log('Token generated successfully')
 
+    const { password: _, ...usuarioSinPassword } = usuario
     res.json({ usuario: usuarioSinPassword, token })
   } catch (error) {
-    console.log(error)
-    res.status(500).json({ msg: 'Ocurrió un error' })
+    console.log('Login error:', error)
+    res.status(500).json({ msg: 'Ocurri\u00f3 un error' })
   }
 }
 
@@ -45,7 +51,7 @@ const refreshToken = async (req, res = response) => {
       .single()
 
     if (error || !usuario) {
-      return res.status(404).json({ msg: 'No se encontró el usuario asociado al token' })
+      return res.status(404).json({ msg: 'No se encontr\u00f3 el usuario asociado al token' })
     }
 
     const newToken = await generarJWT(usuario.id)
@@ -54,7 +60,7 @@ const refreshToken = async (req, res = response) => {
     res.json({ usuario: usuarioSinPassword, token: newToken })
   } catch (error) {
     console.log(error)
-    res.status(401).json({ msg: 'Token no válido o expirado' })
+    res.status(401).json({ msg: 'Token no v\u00e1lido o expirado' })
   }
 }
 
