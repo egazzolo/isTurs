@@ -2,7 +2,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Button,
   TouchableOpacity,
   Image,
   ScrollView,
@@ -10,13 +9,9 @@ import {
 } from 'react-native';
 import React, {useEffect} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-
 import Icon from 'react-native-vector-icons/Feather';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import {
-  HomeCompanyStackParamList,
-  HomeStackParamList,
-} from '../../../navigation/types';
+import {HomeCompanyStackParamList} from '../../../navigation/types';
 import {
   selectUser,
   selectUserProfile,
@@ -29,11 +24,11 @@ import ImagePicker from '../../../components/ImagePicker/ImagePicker';
 import ButtonOpacity from '../../../components/ButtonOpacity/ButtonOpacity';
 import {sizeMargin} from '../../../constants';
 import {Colors} from '../../../theme';
-import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 import {RenderSvgXML} from '../../../components/RenderSvgXML/index';
 import {SIZES} from '../../../constants/fonts';
 import useGetFetch from '../../../hook/useGetFetch';
 import Icons from 'react-native-vector-icons/Ionicons';
+import {useTranslation} from '../../../i18n';
 
 type HomeCompany = NativeStackScreenProps<
   HomeCompanyStackParamList,
@@ -93,35 +88,26 @@ export interface TuristProgress {
 }
 
 const HomeCompanyScreen: React.FC<HomeCompany> = ({navigation}) => {
+  const {t} = useTranslation();
   const dispatch = useDispatch();
-  const {data, loading, error, refreshData} = useGetFetch<Empty>(
-    `translation/getMyRequest`,
-  );
+  const {data, loading, refreshData} = useGetFetch<Empty>('translation/getMyRequest');
   const {
     data: TransladistData,
-    loading: TransladistLoading,
-    error: TransladistError,
     refreshData: refreshDataTransladist,
-  } = useGetFetch<EmptyTransladista>(`user/getMyTransfers`);
+  } = useGetFetch<EmptyTransladista>('user/getMyTransfers');
   const {
     data: ProccesTurist,
-    loading: IsLoadingProccesTurist,
-    error: ErrorProccesTurist,
     refreshData: refreshDataProccesTurist,
-  } = useGetFetch<EmptyTuristProgress>(`translation/getMyTuristProcess`);
+  } = useGetFetch<EmptyTuristProgress>('translation/getMyTuristProcess');
+
   const user = useSelector(selectUserProfile);
   const userData = useSelector(selectUser);
 
-  console.log(user);
-  const logout = () => {
-    dispatch(setSignOut());
-  };
+  const logout = () => dispatch(setSignOut());
 
   const handleImageSelected = (image: Asset) => {
     console.log(image.base64);
   };
-
-  console.log(userData, 'userData');
 
   useEffect(() => {
     refreshData();
@@ -141,13 +127,10 @@ const HomeCompanyScreen: React.FC<HomeCompany> = ({navigation}) => {
         />
         <View style={styles.container}>
           <Background xml={AppImages.BACKGROUND} darkOverlay />
-
           <View style={styles.overlayContent}>
-            <Text style={styles.titleText}>Bienvenido</Text>
-
+            <Text style={styles.titleText}>{t.welcome}</Text>
             <View style={styles.headerContainer}>
-              <View
-                style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
+              <View style={{flexDirection: 'row', alignItems: 'center', gap: 10}}>
                 <ImagePicker
                   onImageSelected={handleImageSelected}
                   initialImageUri={`${user}`}
@@ -155,7 +138,7 @@ const HomeCompanyScreen: React.FC<HomeCompany> = ({navigation}) => {
                 <View>
                   <Text style={styles.titleName}>{userData?.name}</Text>
                   <Text style={styles.subtitleUserRole}>
-                    {userData?.role === 'COMPANY' ? 'Empresa' : ''}
+                    {userData?.role === 'COMPANY' ? t.company : ''}
                   </Text>
                 </View>
               </View>
@@ -163,17 +146,14 @@ const HomeCompanyScreen: React.FC<HomeCompany> = ({navigation}) => {
                 onPress={() => navigation.navigate('EditProfileCompanyScreen')}
                 style={styles.btnEditProfile}
                 textStyle={styles.textBtn}>
-                Editar Perfil
+                {t.editProfile}
               </ButtonOpacity>
             </View>
           </View>
 
           <ScrollView
             style={styles.contentContainerElement}
-            contentContainerStyle={{
-              gap: 20,
-              paddingBottom: sizeMargin['spacing-m'],
-            }}>
+            contentContainerStyle={{gap: 20, paddingBottom: sizeMargin['spacing-m']}}>
             <View style={styles.InfoCompany}>
               <View style={styles.infoCompanyIconContainer}>
                 <RenderSvgXML
@@ -182,78 +162,57 @@ const HomeCompanyScreen: React.FC<HomeCompany> = ({navigation}) => {
                   height={20}
                 />
               </View>
-
               <View style={styles.infoCompanyData}>
                 <Text style={styles.titleInfo}>{userData?.name}</Text>
-                <Text style={styles.dataText}>Codigo: {userData?.code}</Text>
-                <Text style={styles.dataText}>Nombre Comercial:</Text>
-                <Text style={styles.dataText}>Teléfono:</Text>
+                <Text style={styles.dataText}>{t.codeLabel} {userData?.code}</Text>
+                <Text style={styles.dataText}>{t.commercialNameLabel}</Text>
+                <Text style={styles.dataText}>{t.phoneLabel}</Text>
                 <Text style={styles.dataText}>
-                  Tipo de empresa: {userData?.type_company}
+                  {t.companyTypeInfoLabel} {userData?.type_company}
                 </Text>
               </View>
             </View>
 
-            <View
-              style={{
-                ...styles.InfoCompany,
-                alignItems: 'center',
-                justifyContent: 'space-around',
-              }}>
+            <View style={{...styles.InfoCompany, alignItems: 'center', justifyContent: 'space-around'}}>
               <View style={styles.CountDetails}>
                 <View style={styles.DetailsIcon}>
-                  <RenderSvgXML
-                    xml={AppImages.icons.Group_Icon}
-                    width={20}
-                    height={20}
-                  />
+                  <RenderSvgXML xml={AppImages.icons.Group_Icon} width={20} height={20} />
                 </View>
-
                 <Text style={styles.count}>{TransladistData?.count}</Text>
-                <Text style={styles.dataText}>Transladistas</Text>
+                <Text style={styles.dataText}>{t.drivers}</Text>
               </View>
               <View style={styles.CountDetails}>
                 <View style={styles.DetailsIcon}>
-                  <RenderSvgXML
-                    xml={AppImages.icons.Group_Icon}
-                    width={20}
-                    height={20}
-                  />
+                  <RenderSvgXML xml={AppImages.icons.Group_Icon} width={20} height={20} />
                 </View>
-
                 <Text style={styles.count}>{ProccesTurist?.count}</Text>
-                <Text style={styles.dataText}>Turistas</Text>
+                <Text style={styles.dataText}>{t.tourists}</Text>
               </View>
               <View style={styles.CountDetails}>
                 <View style={styles.DetailsIcon}>
-                  <RenderSvgXML
-                    xml={AppImages.icons.User_Icon}
-                    width={20}
-                    height={20}
-                  />
+                  <RenderSvgXML xml={AppImages.icons.User_Icon} width={20} height={20} />
                 </View>
-
                 <Text style={styles.count}>{data?.count}</Text>
-                <Text style={styles.dataText}>Solicitudes</Text>
+                <Text style={styles.dataText}>{t.requests}</Text>
               </View>
             </View>
 
             <TouchableOpacity
               style={styles.button}
               onPress={() => navigation.navigate('TouristsInProgress')}>
-              <Text style={styles.buttonText}>Turistas en curso</Text>
+              <Text style={styles.buttonText}>{t.touristsInProgress}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.button}
               onPress={() => navigation.navigate('ListOfTransferorsScreen')}>
-              <Text style={styles.buttonText}>Lista de trasladistas</Text>
+              <Text style={styles.buttonText}>{t.listOfDrivers}</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={styles.button}
               onPress={() => navigation.navigate('TouristRequestsScreen')}>
-              <Text style={styles.buttonText}>Solicitudes de turistas</Text>
+              <Text style={styles.buttonText}>{t.touristRequests}</Text>
             </TouchableOpacity>
           </ScrollView>
         </View>
@@ -263,22 +222,14 @@ const HomeCompanyScreen: React.FC<HomeCompany> = ({navigation}) => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    position: 'relative',
-    gap: 20,
-  },
+  container: {flex: 1, position: 'relative', gap: 20},
   contentContainerElement: {
     flex: 1,
     paddingVertical: sizeMargin['spacing-s'],
     marginHorizontal: sizeMargin['spacing-xxs'],
     marginBottom: sizeMargin['spacing-l'],
   },
-  titleText: {
-    fontSize: 25,
-    fontWeight: 'bold',
-    color: 'white',
-  },
+  titleText: {fontSize: 25, fontWeight: 'bold', color: 'white'},
   headerContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -288,7 +239,6 @@ const styles = StyleSheet.create({
   },
   overlayContent: {
     paddingTop: sizeMargin['spacing-s'],
- 
     paddingHorizontal: sizeMargin['spacing-xxs'],
   },
   btnEditProfile: {
@@ -297,23 +247,14 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary,
     borderRadius: 15,
   },
-  textBtn: {
-    color: 'white',
-    fontSize: 15,
-    fontWeight: '600',
-  },
+  textBtn: {color: 'white', fontSize: 15, fontWeight: '600'},
   button: {
     backgroundColor: Colors.primary,
     padding: 15,
     borderRadius: 125,
     alignItems: 'center',
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-
+  buttonText: {color: 'white', fontSize: 18, fontWeight: 'bold'},
   InfoCompany: {
     backgroundColor: '#f8f8f8',
     padding: sizeMargin['spacing-xxs'],
@@ -332,25 +273,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   infoCompanyData: {},
-  titleInfo: {
-    color: 'black',
-    fontSize: SIZES.XXMEDIUM,
-    fontWeight: 'bold',
-  },
-  dataText: {
-    color: '#888888',
-    fontSize: SIZES.MEDIUM,
-    fontWeight: '500',
-  },
-  count: {
-    color: 'black',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  CountDetails: {
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
+  titleInfo: {color: 'black', fontSize: SIZES.XXMEDIUM, fontWeight: 'bold'},
+  dataText: {color: '#888888', fontSize: SIZES.MEDIUM, fontWeight: '500'},
+  count: {color: 'black', fontSize: 16, fontWeight: 'bold'},
+  CountDetails: {justifyContent: 'space-around', alignItems: 'center'},
   DetailsIcon: {
     width: 45,
     height: 45,
@@ -361,16 +287,8 @@ const styles = StyleSheet.create({
     borderColor: '#3399FF',
     borderWidth: 1,
   },
-  titleName: {
-    fontWeight: '600',
-    fontSize: 20,
-    color: 'white',
-  },
-  subtitleUserRole: {
-    fontWeight: '400',
-    fontSize: 16,
-    color: '#b0b1b4',
-  },
+  titleName: {fontWeight: '600', fontSize: 20, color: 'white'},
+  subtitleUserRole: {fontWeight: '400', fontSize: 16, color: '#b0b1b4'},
 });
 
 export default HomeCompanyScreen;

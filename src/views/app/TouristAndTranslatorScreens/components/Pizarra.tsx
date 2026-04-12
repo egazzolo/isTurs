@@ -1,23 +1,21 @@
 import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, StyleSheet} from 'react-native';
 import CustomInput from '../../../../components/CustomInput/CustomInput';
-import usePost from '../../../../hook/usePostFetch';
 import Alert from '../../../../services/Alert';
 import usePut from '../../../../hook/usePut';
-import { useSelector } from 'react-redux';
-import { selectUserRole } from '../../../../redux/slices/auth.slice';
+import {useSelector} from 'react-redux';
+import {selectUserRole} from '../../../../redux/slices/auth.slice';
+import {useTranslation} from '../../../../i18n';
 
-export default function Pizarra({data,refreshData}: any) {
+export default function Pizarra({data, refreshData}: any) {
   const [texto, setTexto] = useState('');
   const [textoGuardado, setTextoGuardado] = useState('');
   const userRole = useSelector(selectUserRole);
-  const {
-    putData,
-    isLoading,
-    error: PostError,
-  } = usePut({
+  const {t} = useTranslation();
+
+  const {putData, isLoading} = usePut({
     onSuccess: () => {
-      Alert.success('Codigo enviado con exito');
+      Alert.success(t.boardSaved);
       refreshData();
     },
     onError: error => console.error('Error:', error),
@@ -29,50 +27,39 @@ export default function Pizarra({data,refreshData}: any) {
     }
   }, [data.turistProgress]);
 
-const handleSubmit = async () => {
-  putData(`/translation/editTranslation`,{
-    id_translation: data.turistProgress[0]._id,
-    chart: texto,
-  })
-}
-
-  const guardarTexto = () => {
-    setTextoGuardado(texto);
+  const handleSubmit = async () => {
+    putData('/translation/editTranslation', {
+      id_translation: data.turistProgress[0]._id,
+      chart: texto,
+    });
   };
+
   return (
     <View style={styles.container}>
       <View style={styles.pizarra}>
         <Text style={styles.textoPizarra}>{textoGuardado}</Text>
         <View style={styles.cuerpoPizarra} />
       </View>
-{
-  userRole !== "TURIST" && (
-<>
-<CustomInput
-        value={texto}
-        onChangeText={setTexto}
-        placeholder="Ingresar texto"
-        placeholderTextColor="#00000089"
-        containerStyle={styles.customInput}
-      />
-
-      <TouchableOpacity style={styles.botonGuardar} onPress={handleSubmit}>
-        <Text style={styles.textoBoton}>Guardar</Text>
-      </TouchableOpacity>
-</>
-  )
-}
-     
+      {userRole !== 'TURIST' && (
+        <>
+          <CustomInput
+            value={texto}
+            onChangeText={setTexto}
+            placeholder={t.boardInputPlaceholder}
+            placeholderTextColor="#00000089"
+            containerStyle={styles.customInput}
+          />
+          <TouchableOpacity style={styles.botonGuardar} onPress={handleSubmit}>
+            <Text style={styles.textoBoton}>{t.save}</Text>
+          </TouchableOpacity>
+        </>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
+  container: {flex: 1, alignItems: 'center', justifyContent: 'center'},
   pizarra: {
     width: '90%',
     height: 200,
@@ -81,12 +68,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 20,
-
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
+    shadowOffset: {width: 0, height: 2},
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
     elevation: 5,
@@ -97,11 +80,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: 'black',
   },
-  customInput: {
-    marginTop: 80,
-    paddingHorizontal: 10,
-    width: '80%', // O el ancho que prefieras
-  },
+  customInput: {marginTop: 80, paddingHorizontal: 10, width: '80%'},
   botonGuardar: {
     backgroundColor: '#007AFF',
     padding: 10,
@@ -109,12 +88,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     width: '40%',
   },
-  textoBoton: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-
-  },
+  textoBoton: {color: 'white', fontWeight: 'bold', textAlign: 'center'},
   cuerpoPizarra: {
     position: 'absolute',
     backgroundColor: 'white',

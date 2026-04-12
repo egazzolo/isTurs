@@ -1,56 +1,25 @@
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-} from 'react-native';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import React, {useState} from 'react';
 import {Background} from '../../components/Background/Background';
 import AppImages from '../../assets/icon';
-import {RenderSvgXML} from '../../components/RenderSvgXML';
 import CustomInput from '../../components/CustomInput/CustomInput';
 import {CustomButton} from '../../components/CustomButton/CustomButton';
-import {SIZES_MEDIUM} from '../../constants/fonts';
 import {sizeMargin} from '../../constants';
 import CustomCheckbox from '../../components/CustomCheckbox/CustomCheckbox';
 import CustomSelectBottomSheet from '../../components/CustomSelectBottomSheet/CustomSelectBottomSheet';
 import usePost from '../../hook/usePostFetch';
-import {useDispatch} from 'react-redux';
-import {showToast} from '../../redux/slices/toast.slice';
 import Alert from '../../services/Alert';
 import {useNavigation} from '@react-navigation/native';
 import FullScreenLoader from '../../components/UI/FullScreenLoader';
+import {useTranslation} from '../../i18n';
 
 interface RegisterResponse {
   name: string;
   email: string;
   username: string;
-  code: string;
-  type_company: string;
-  company: string;
   role: string;
   uid: string;
 }
-
-const options = [
-  {id: '1', name: 'Juridica'},
-  {id: '2', name: 'Natural'},
-];
-
-const areAllFieldsFilled = (state: any) => {
-  const requiredFields = [
-    'companyName',
-    'socialReason',
-    'ruc',
-    'cellphone',
-    'username',
-    'password',
-    'confirmPassword',
-  ];
-
-  return requiredFields.every(field => state[field].trim() !== '');
-};
 
 const initialFormState = {
   companyName: '',
@@ -65,9 +34,14 @@ const initialFormState = {
 
 export default function RegisterCompany() {
   const navigation = useNavigation();
-  const dispatch = useDispatch();
+  const {t} = useTranslation();
   const [formState, setFormState] = useState(initialFormState);
   const [typeCompany, setTypeCompany] = useState('');
+
+  const options = [
+    {id: '1', name: t.juridica},
+    {id: '2', name: t.natural},
+  ];
 
   const handleChange = (name: any, value: any) => {
     setFormState(prevState => ({
@@ -76,9 +50,9 @@ export default function RegisterCompany() {
     }));
   };
 
-  const {postData, data, isLoading, error} = usePost<RegisterResponse>({
+  const {postData, isLoading} = usePost<RegisterResponse>({
     onSuccess: () => {
-      Alert.success('!Registro exitoso!');
+      Alert.success(t.registrationSuccess);
       navigation.goBack();
       setFormState(initialFormState);
     },
@@ -86,25 +60,29 @@ export default function RegisterCompany() {
   });
 
   const handleSubmmit = () => {
-    // Verificar si todos los campos están llenos.
-    if (!areAllFieldsFilled(formState)) {
-      Alert.info('Todos los campos son obligatorios');
+    if (
+      !formState.companyName.trim() ||
+      !formState.socialReason.trim() ||
+      !formState.ruc.trim() ||
+      !formState.cellphone.trim() ||
+      !formState.username.trim() ||
+      !formState.password.trim() ||
+      !formState.confirmPassword.trim()
+    ) {
+      Alert.info(t.allFieldsRequired);
       return;
     }
 
-    // Verificar si las contraseñas coinciden.
     if (formState.password !== formState.confirmPassword) {
-      Alert.info('Las contraseñas no coinciden');
+      Alert.info(t.passwordMismatch);
       return;
     }
 
-    // Verificar si los términos y condiciones están aceptados.
     if (!formState.isChecked) {
-      Alert.info('Debes aceptar los términos y condiciones');
+      Alert.info(t.acceptTermsRequired);
       return;
     }
 
-    console.log(formState, 'formState');
     postData('/user', {
       role: 'COMPANY',
       name: formState.companyName,
@@ -120,59 +98,55 @@ export default function RegisterCompany() {
       <Background xml={AppImages.BACKGROUND} darkOverlay />
       <View style={styles.container}>
         <View style={styles.titleContainer}>
-          <Text style={styles.textTitle}>Registro</Text>
-          <Text style={styles.textRole}>Empresa</Text>
+          <Text style={styles.textTitle}>{t.registration}</Text>
+          <Text style={styles.textRole}>{t.company}</Text>
         </View>
         <View style={styles.overlayContent}>
           <CustomInput
-            placeholder="Nombre Comercial"
+            placeholder={t.commercialName}
             onChangeText={value => handleChange('companyName', value)}
           />
           <CustomInput
-            placeholder="Razón Social"
+            placeholder={t.socialReason}
             onChangeText={value => handleChange('socialReason', value)}
           />
           <CustomInput
-            placeholder="RUC"
+            placeholder={t.ruc}
             onChangeText={value => handleChange('ruc', value)}
           />
           <CustomInput
-            placeholder="Celular"
+            placeholder={t.phone}
             onChangeText={value => handleChange('cellphone', value)}
             keyboardType="numeric"
           />
           <CustomSelectBottomSheet
-            textButton={'Tipo de Empresa'}
+            textButton={t.companyType}
             items={options}
-            onSelect={value => {
-              setTypeCompany(value.name);
-            }}
+            onSelect={value => setTypeCompany(value.name)}
           />
           <CustomInput
-            placeholder="Nombre de Usuario"
+            placeholder={t.username}
             onChangeText={value => handleChange('username', value)}
           />
           <CustomInput
-            placeholder="Contraseña"
+            placeholder={t.password}
             isSecure={true}
             onChangeText={value => handleChange('password', value)}
           />
           <CustomInput
-            placeholder="Confirmar Contraseña"
+            placeholder={t.confirmPassword}
             isSecure={true}
             onChangeText={value => handleChange('confirmPassword', value)}
           />
-
           <CustomCheckbox
-            label="Acepto los términos y condiciones"
+            label={t.termsAndConditions}
             checked={formState.isChecked}
             onCheck={() => handleChange('isChecked', !formState.isChecked)}
           />
-          <CustomButton title="Regístrate" onPress={() => handleSubmmit()} />
+          <CustomButton title={t.register} onPress={() => handleSubmmit()} />
         </View>
       </View>
-      <FullScreenLoader visible={isLoading}/>
-
+      <FullScreenLoader visible={isLoading} />
     </ScrollView>
   );
 }
@@ -185,15 +159,9 @@ const styles = StyleSheet.create({
   overlayContent: {
     width: '100%',
     alignItems: 'center',
-
     paddingVertical: sizeMargin['spacing-xxs'],
     paddingHorizontal: sizeMargin['spacing-s'],
     gap: 20,
-  },
-  textStyle: {
-    marginTop: 20,
-    fontSize: 18,
-    color: 'black',
   },
   titleContainer: {
     paddingTop: 20,

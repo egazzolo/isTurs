@@ -15,6 +15,7 @@ import CustomInput from '../../../../components/CustomInput/CustomInput';
 import usePost from '../../../../hook/usePostFetch';
 import Alert from '../../../../services/Alert';
 import FullScreenLoader from '../../../../components/UI/FullScreenLoader';
+import {useTranslation} from '../../../../i18n';
 
 const initialState = {
   empresa: '',
@@ -24,18 +25,10 @@ const initialState = {
   horaDisplay: '',
 };
 
-function convertTo24Hour(time:any) {
-  if (!time) {
-    // Si time es null, undefined o una cadena vacía, devolver lo que sea apropiado, por ejemplo '00:00'
-    return '00:00';
-  }
-  
+function convertTo24Hour(time: any) {
+  if (!time) return '00:00';
   const timeMatch = time.match(/(\d+):(\d+)(?:\s)?(AM|PM)/i);
-  if (!timeMatch) {
-
-    return time; // O devolver un valor predeterminado
-  }
-
+  if (!timeMatch) return time;
   let [hours, minutes] = timeMatch.slice(1, 3);
   if (time.includes('PM') && hours !== '12') {
     hours = parseInt(hours, 10) + 12;
@@ -45,35 +38,26 @@ function convertTo24Hour(time:any) {
   return `${hours}:${minutes}`;
 }
 
-
-export default function AceptTurists({turista,setSelectedTurista,refreshData}: any) {
-  console.log(turista);
-  const {data, error, loading} = useGetFetch('/user/getMyTransfers');
+export default function AceptTurists({turista, setSelectedTurista, refreshData}: any) {
+  const {t} = useTranslation();
+  const {data, loading} = useGetFetch('/user/getMyTransfers');
   const [formState, setFormState] = useState(initialState);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
   const [timePickerVisible, setTimePickerVisible] = useState(false);
 
-  const {
-    postData,
-    isLoading,
-    error: PostError,
-  } = usePost({
+  const {postData, isLoading} = usePost({
     onSuccess: () => {
-      console.log('Operación exitosa');
-      Alert.success('Operación exitosa');
+      Alert.success(t.operationSuccess);
       setSelectedTurista(null);
       refreshData();
     },
     onError: error => console.error('Error:', error.response),
   });
 
-
-  const OptionsTransladitas = (data as any)?.users?.map((item: any) => {
-    return {
-      id: item.uid,
-      name: item.name,
-    };
-  });
+  const OptionsTransladitas = (data as any)?.users?.map((item: any) => ({
+    id: item.uid,
+    name: item.name,
+  }));
 
   const handleInputChange = (name: string, value: string) => {
     setFormState({...formState, [name]: value});
@@ -99,19 +83,12 @@ export default function AceptTurists({turista,setSelectedTurista,refreshData}: a
       const ampm = hours >= 12 ? 'PM' : 'AM';
       const formattedHours = hours % 12 || 12;
       const formattedMinutes = `0${minutes}`.slice(-2);
-
-      handleInputChange(
-        'horaDisplay',
-        `${formattedHours}:${formattedMinutes} ${ampm}`,
-      );
+      handleInputChange('horaDisplay', `${formattedHours}:${formattedMinutes} ${ampm}`);
     }
   };
 
-  // console.log(formState, 'formState');
-  // console.log(turista, 'turista')
-
   const handleSubmit = () => {
-    const payload = {
+    postData('/translation/acceptTourist', {
       turist_id: turista.turist_id,
       transfer_id: formState.empresa,
       id_translation: turista._id,
@@ -119,60 +96,58 @@ export default function AceptTurists({turista,setSelectedTurista,refreshData}: a
       destination: formState.destino,
       date: formState.fecha,
       hour: formState.horaDisplay,
-    };
-
-    postData('/translation/acceptTourist', payload);
-  }
+    });
+  };
 
   useEffect(() => {
     if (formState.horaDisplay) {
       const time24hr = convertTo24Hour(formState.horaDisplay);
-      setFormState(prevState => ({ ...prevState, horaDisplay: time24hr }));
+      setFormState(prev => ({...prev, horaDisplay: time24hr}));
     }
   }, [formState.horaDisplay]);
-  
-  
 
   return (
     <ScrollView style={styles.overlayContent}>
-      <View style={{flex: 1, gap: 8,paddingBottom:60}}>
-        <Text style={styles.title}>Aceptación de turista</Text>
+      <View style={{flex: 1, gap: 8, paddingBottom: 60}}>
+        <Text style={styles.title}>{t.acceptTouristTitle}</Text>
         <View style={styles.turistDetails}>
           <Text style={styles.turistName}>{turista.turist_name}</Text>
         </View>
 
         <Box>
-          <Text style={styles.textStyle}>Trasladista:</Text>
+          <Text style={styles.textStyle}>{t.driverLabel}</Text>
           <CustomSelectBottomSheet
-            textButton={formState.empresa || 'Seleccione trasladista'}
+            textButton={formState.empresa || t.selectDriver}
             loading={loading}
             items={OptionsTransladitas}
             onSelect={item => handleInputChange('empresa', item.id)}
           />
         </Box>
+
         <Box>
-          <Text style={styles.textStyle}>Lugar de origen:</Text>
+          <Text style={styles.textStyle}>{t.originPlace}</Text>
           <CustomInput
-            placeholder="Ingrese lugar de origen"
+            placeholder={t.originPlaceholder}
             value={formState.origen}
             onChangeText={text => handleInputChange('origen', text)}
           />
         </Box>
 
         <Box>
-          <Text style={styles.textStyle}>Lugar de destino:</Text>
+          <Text style={styles.textStyle}>{t.destinationPlace}</Text>
           <CustomInput
-            placeholder="Ingrese lugar de destino"
+            placeholder={t.destinationPlaceholder}
             value={formState.destino}
             onChangeText={text => handleInputChange('destino', text)}
           />
         </Box>
+
         <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
           <Box width={'45%'}>
             <TouchableOpacity onPress={() => setDatePickerVisible(true)}>
-              <Text style={styles.textStyle}>Fecha:</Text>
+              <Text style={styles.textStyle}>{t.dateLabel}</Text>
               <Text style={styles.inputDisplay}>
-                {formState.fecha || 'Fecha'}
+                {formState.fecha || t.datePlaceholder}
               </Text>
             </TouchableOpacity>
             {datePickerVisible && (
@@ -184,12 +159,11 @@ export default function AceptTurists({turista,setSelectedTurista,refreshData}: a
               />
             )}
           </Box>
-
           <Box width={'45%'}>
             <TouchableOpacity onPress={() => setTimePickerVisible(true)}>
-              <Text style={styles.textStyle}>Hora:</Text>
+              <Text style={styles.textStyle}>{t.timeLabel}</Text>
               <Text style={styles.inputDisplay}>
-                {formState.horaDisplay || 'Hora'}
+                {formState.horaDisplay || t.timePlaceholder}
               </Text>
             </TouchableOpacity>
             {timePickerVisible && (
@@ -203,24 +177,18 @@ export default function AceptTurists({turista,setSelectedTurista,refreshData}: a
             )}
           </Box>
         </View>
-      <TouchableOpacity
-        style={[styles.btn]}
-        onPress={() => handleSubmit()}
-        // disabled={isStartDisabled}
-      >
-        <Text style={styles.btnText}>Empezar</Text>
-      </TouchableOpacity>
+
+        <TouchableOpacity style={styles.btn} onPress={handleSubmit}>
+          <Text style={styles.btnText}>{t.start}</Text>
+        </TouchableOpacity>
       </View>
-      <FullScreenLoader visible={isLoading}/>
+      <FullScreenLoader visible={isLoading} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  overlayContent: {
-    flex: 1,
-    paddingHorizontal: sizeMargin['spacing-xxs'],
-  },
+  overlayContent: {flex: 1, paddingHorizontal: sizeMargin['spacing-xxs']},
   title: {
     fontSize: 22,
     fontWeight: 'bold',
@@ -233,16 +201,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginVertical: sizeMargin['spacing-xxs'],
   },
-  turistName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#767676',
-  },
-  textStyle: {
-    color: 'black',
-    fontSize: 15,
-    marginTop: 5,
-  },
+  turistName: {fontSize: 18, fontWeight: 'bold', color: '#767676'},
+  textStyle: {color: 'black', fontSize: 15, marginTop: 5},
   inputDisplay: {
     fontSize: 16,
     paddingVertical: 8,
@@ -255,14 +215,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
     textAlign: 'center',
   },
-  btn: {
-    backgroundColor: '#0373f3',
-    padding: 15,
-    borderRadius: 50,
-  },
-  disabledBtn: {
-    backgroundColor: '#CCCCCC', // un gris para indicar que el botón está deshabilitado
-  },
+  btn: {backgroundColor: '#0373f3', padding: 15, borderRadius: 50},
   btnText: {
     color: 'white',
     textAlign: 'center',

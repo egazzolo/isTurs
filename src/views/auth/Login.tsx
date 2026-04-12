@@ -1,9 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import {
-  selectToken,
   selectUser,
-  selectUserRole,
   setSignIn,
 } from '../../redux/slices/auth.slice';
 import {
@@ -12,7 +10,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   TextInput,
-  Modal,
   Button,
   ScrollView,
 } from 'react-native';
@@ -29,6 +26,8 @@ import CustomModal from '../../components/CustomModal/CustomModal';
 import usePost from '../../hook/usePostFetch';
 import Alert from '../../services/Alert';
 import FullScreenLoader from '../../components/UI/FullScreenLoader';
+import {useTranslation} from '../../i18n';
+import LanguageSelector from '../../components/LanguageSelector/LanguageSelector';
 
 type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -57,19 +56,17 @@ const initialFormState = {
 
 export default function HomeScreen({navigation}: LoginScreenProps) {
   const dispatch = useDispatch();
+  const {t} = useTranslation();
   const [isModalVisible, setModalVisible] = useState(false);
   const [selectedOption, setSelectedOption] = useState<
     keyof AuthStackParamList | null
   >(null);
   const [accessCode, setAccessCode] = useState('');
-
   const [formState, setFormState] = useState(initialFormState);
-  const [loginResponse, setLoginResponse] = useState<RegisterResponse | null>(
-    null,
-  );
   const user = useSelector(selectUser);
 
   console.log(user, 'userrr');
+
   const handleChange = (name: any, value: any) => {
     setFormState(prevState => ({
       ...prevState,
@@ -77,38 +74,29 @@ export default function HomeScreen({navigation}: LoginScreenProps) {
     }));
   };
 
-  const { postData, data, isLoading, error } = usePost<RegisterResponse>({
-    onSuccess: () => {
-      // No necesitas configurar el estado aquí ya que la acción Redux se despachará en useEffect
-    },
-    onError: (error) => {
-      // Manejo de errores
+  const {postData, data, isLoading} = usePost<RegisterResponse>({
+    onSuccess: () => {},
+    onError: error => {
       Alert.warning(error.response.data.msg);
     },
   });
 
   useEffect(() => {
     if (!isLoading && data) {
-      Alert.success('¡Inicio de sesión exitoso!');
+      Alert.success(t.loginSuccess);
       dispatch(
         setSignIn({
           usuario: {
             ...data.usuario,
-            imageUrl: IMAGE_URL_PLACEHOLDER, 
+            imageUrl: IMAGE_URL_PLACEHOLDER,
           },
           token: data.token,
         }),
       );
-      
     }
-  }, [data, isLoading, navigation, dispatch]); 
-
-  console.log(data, 'data');
-
-
+  }, [data, isLoading, navigation, dispatch]);
 
   const doLogin = () => {
-    // console.log(formState, 'formState')
     postData('/auth/login', {
       username: formState.username,
       password: formState.password,
@@ -150,9 +138,8 @@ export default function HomeScreen({navigation}: LoginScreenProps) {
       <Background xml={AppImages.BACKGROUND} darkOverlay />
       <View style={styles.container}>
         <View style={styles.overlayContent}>
-          <Text style={styles.forgotPassword}>
-            Innovación y seguridad en su traslado
-          </Text>
+          <LanguageSelector variant="light" />
+          <Text style={styles.tagline}>{t.tagline}</Text>
           <View style={styles.logoContainer}>
             <RenderSvgXML
               xml={AppImages.LOGO_ISTURS}
@@ -161,39 +148,35 @@ export default function HomeScreen({navigation}: LoginScreenProps) {
             />
           </View>
           <CustomInput
-            placeholder="Nombre de Usuario"
+            placeholder={t.username}
             onChangeText={value => handleChange('username', value)}
           />
           <CustomInput
-            placeholder="Contraseña"
+            placeholder={t.password}
             isSecure={true}
             onChangeText={value => handleChange('password', value)}
           />
-          <CustomButton title="Iniciar Sesión" onPress={doLogin} />
-          <CustomButton
-            title="Regístrate"
-            onPress={handleRegisterPress}
-            invert
-          />
+          <CustomButton title={t.login} onPress={doLogin} />
+          <CustomButton title={t.register} onPress={handleRegisterPress} invert />
           <TouchableOpacity>
-            <Text style={styles.forgotPassword}>¿Olvidó su contraseña?</Text>
+            <Text style={styles.tagline}>{t.forgotPassword}</Text>
           </TouchableOpacity>
         </View>
         <CustomModal isVisible={isModalVisible} onClose={cleanUpStates}>
           {!selectedOption && (
             <>
               <CustomButton
-                title="Empresa"
+                title={t.company}
                 onPress={() => handleOptionSelect('RegisterCompanyScreen')}
                 invert
               />
               <CustomButton
-                title="Transladista"
+                title={t.operator}
                 onPress={() => handleOptionSelect('RegisterOperatorScreen')}
                 invert
               />
               <CustomButton
-                title="Turista"
+                title={t.tourist}
                 onPress={() => handleOptionSelect('RegisterTuristScreen')}
               />
             </>
@@ -201,18 +184,18 @@ export default function HomeScreen({navigation}: LoginScreenProps) {
           {selectedOption && selectedOption !== 'RegisterTuristScreen' && (
             <View>
               <TextInput
-                placeholder="Ingrese su código"
+                placeholder={t.enterCode}
                 placeholderTextColor={'black'}
                 value={accessCode}
                 onChangeText={setAccessCode}
                 style={styles.input}
               />
-              <Button title="Verificar Código" onPress={verifyAccessCode} />
+              <Button title={t.verifyCode} onPress={verifyAccessCode} />
             </View>
           )}
         </CustomModal>
       </View>
-      <FullScreenLoader visible={isLoading}/>
+      <FullScreenLoader visible={isLoading} />
     </ScrollView>
   );
 }
@@ -230,35 +213,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: sizeMargin['spacing-s'],
     gap: 30,
   },
-  textStyle: {
-    marginTop: 20,
-    fontSize: 18,
-    color: 'black',
-  },
   logoContainer: {
     backgroundColor: 'white',
     borderRadius: 170 / 2,
   },
-  forgotPassword: {
+  tagline: {
     color: 'white',
     fontWeight: 'bold',
     fontSize: SIZES_MEDIUM.XMEDIUM,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 20,
-    padding: 35,
-    alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-    marginTop: '50%',
   },
   input: {
     borderWidth: 1,
@@ -268,13 +230,5 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     width: 200,
     color: 'black',
-  },
-  optionButton: {
-    width: '100%',
-    marginBottom: 10, // Espaciado entre botones
-    alignItems: 'center', // Alineación del texto en el centro
-    backgroundColor: '#e0e0e0', // Fondo ligeramente gris para resaltar
-    padding: 10, // Padding para mayor área de toque
-    borderRadius: 5, // Bordes redondeados para estética
   },
 });

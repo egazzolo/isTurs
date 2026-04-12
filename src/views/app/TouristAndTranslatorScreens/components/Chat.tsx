@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import {
   View,
   FlatList,
@@ -10,28 +10,26 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import axiosClient from '../../../../api';
+import {useTranslation} from '../../../../i18n';
 
-const Chat = ({ data }: any) => {
+const Chat = ({data}: any) => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const chatId = data.turistProgress[0]._id;
-  const { height } = useWindowDimensions();
+  const {height} = useWindowDimensions();
   const flatListRef = useRef<FlatList>(null);
+  const {t} = useTranslation();
 
   useEffect(() => {
-    // Fetch messages every 2 seconds
     const intervalId = setInterval(fetchMessages, 2000);
-
-    // Initial fetch
     fetchMessages();
-
-    return () => clearInterval(intervalId); // Clear interval on component unmount
+    return () => clearInterval(intervalId);
   }, [chatId]);
 
   useEffect(() => {
     if (isFirstLoad && flatListRef.current) {
-      flatListRef.current.scrollToEnd({ animated: true });
+      flatListRef.current.scrollToEnd({animated: true});
       setIsFirstLoad(false);
     }
   }, [messages, isFirstLoad]);
@@ -48,55 +46,53 @@ const Chat = ({ data }: any) => {
   const sendMessage = async () => {
     if (inputText.trim()) {
       try {
-        const messageData = {
-          chatId: chatId,
+        await axiosClient.post('/chats/createMessage', {
+          chatId,
           text: inputText,
-        };
-        await axiosClient.post(`/chats/createMessage`, messageData);
-        setInputText(''); // Clear input after sending
-        fetchMessages(); // Refresh messages after sending
+        });
+        setInputText('');
+        fetchMessages();
       } catch (error) {
         console.error('Error sending message:', error);
       }
     }
   };
 
-  const renderMessageItem = ({ item }: any) => {
+  const renderMessageItem = ({item}: any) => {
     const isTourist = item.user_role === 'TURIST';
     return (
       <View
         style={[
           styles.messageRow,
           isTourist ? styles.touristMessageRow : styles.driverMessageRow,
-        ]}
-      >
+        ]}>
         <View
           style={[
             styles.messageContainer,
             isTourist
               ? styles.touristMessageContainer
               : styles.driverMessageContainer,
-          ]}
-        >
+          ]}>
           {!isTourist && (
             <View style={styles.avatarContainer}>
-              <Image source={{ uri: item.user_img }} style={styles.avatar} />
+              <Image source={{uri: item.user_img}} style={styles.avatar} />
             </View>
           )}
           <View
             style={[
               styles.messageBubble,
               isTourist ? styles.touristMessage : styles.driverMessage,
-            ]}
-          >
+            ]}>
             <Text style={styles.roleText}>
-              {isTourist ? `Turista - ${item.user_name}` : `Trasladista - ${item.user_name}`}
+              {isTourist
+                ? `${t.touristRole} - ${item.user_name}`
+                : `${t.driverRole} - ${item.user_name}`}
             </Text>
             <Text style={styles.messageText}>{item.message}</Text>
           </View>
           {isTourist && (
             <View style={styles.avatarContainer}>
-              <Image source={{ uri: item.user_img }} style={styles.avatar} />
+              <Image source={{uri: item.user_img}} style={styles.avatar} />
             </View>
           )}
         </View>
@@ -105,16 +101,16 @@ const Chat = ({ data }: any) => {
   };
 
   return (
-    <View style={{ ...styles.container, height: height - 220 }}>
+    <View style={{...styles.container, height: height - 220}}>
       <FlatList
         ref={flatListRef}
         data={messages}
         renderItem={renderMessageItem}
-        keyExtractor={(item) => item._id}
+        keyExtractor={item => (item as any)._id}
         style={styles.messageList}
         onContentSizeChange={() => {
           if (isFirstLoad) {
-            flatListRef.current?.scrollToEnd({ animated: true });
+            flatListRef.current?.scrollToEnd({animated: true});
           }
         }}
       />
@@ -122,11 +118,11 @@ const Chat = ({ data }: any) => {
         <TextInput
           value={inputText}
           onChangeText={setInputText}
-          placeholder="Escribe tu mensaje"
+          placeholder={t.messagePlaceholder}
           style={styles.input}
         />
         <TouchableOpacity onPress={sendMessage}>
-          <Text style={styles.sendText}>Enviar</Text>
+          <Text style={styles.sendText}>{t.send}</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -140,34 +136,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderRadius: 20,
   },
-  messageList: {
-    flex: 1,
-  },
-  messageRow: {
-    flexDirection: 'row',
-    marginVertical: 10,
-  },
-  messageContainer: {
-    flexDirection: 'row',
-    alignItems: 'flex-end',
-  },
-  touristMessageRow: {
-    justifyContent: 'flex-end',
-  },
-  driverMessageRow: {
-    justifyContent: 'flex-start',
-  },
-  touristMessageContainer: {
-    marginRight: 8,
-  },
-  driverMessageContainer: {
-    marginLeft: 8,
-  },
-  messageBubble: {
-    borderRadius: 20,
-    padding: 10,
-    width: '70%',
-  },
+  messageList: {flex: 1},
+  messageRow: {flexDirection: 'row', marginVertical: 10},
+  messageContainer: {flexDirection: 'row', alignItems: 'flex-end'},
+  touristMessageRow: {justifyContent: 'flex-end'},
+  driverMessageRow: {justifyContent: 'flex-start'},
+  touristMessageContainer: {marginRight: 8},
+  driverMessageContainer: {marginLeft: 8},
+  messageBubble: {borderRadius: 20, padding: 10, width: '70%'},
   touristMessage: {
     backgroundColor: '#dcf8c6',
     marginRight: 8,
@@ -180,15 +156,8 @@ const styles = StyleSheet.create({
     marginLeft: 8,
     marginRight: 'auto',
   },
-  messageText: {
-    fontSize: 16,
-    color: 'black',
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 15,
-  },
+  messageText: {fontSize: 16, color: 'black'},
+  avatar: {width: 40, height: 40, borderRadius: 15},
   inputContainer: {
     flexDirection: 'row',
     padding: 8,
@@ -206,19 +175,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     color: 'black',
   },
-  sendText: {
-    alignSelf: 'center',
-    color: '#007bff',
-    fontSize: 16,
-  },
-  avatarContainer: {
-    alignItems: 'center',
-  },
-  roleText: {
-    fontSize: 12,
-    color: 'grey',
-    marginBottom: 2,
-  },
+  sendText: {alignSelf: 'center', color: '#007bff', fontSize: 16},
+  avatarContainer: {alignItems: 'center'},
+  roleText: {fontSize: 12, color: 'grey', marginBottom: 2},
 });
 
 export default Chat;

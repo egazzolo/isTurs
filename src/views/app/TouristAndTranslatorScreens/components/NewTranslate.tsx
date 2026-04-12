@@ -11,12 +11,9 @@ import CustomInput from '../../../../components/CustomInput/CustomInput';
 import CustomSelectBottomSheet from '../../../../components/CustomSelectBottomSheet/CustomSelectBottomSheet';
 import {Box} from '../../../../components/Box';
 import useGetFetch from '../../../../hook/useGetFetch';
-import {err} from 'react-native-svg';
-import {useSelector} from 'react-redux';
-import {selectToken} from '../../../../redux/slices/auth.slice';
-import FullScreenLoader from '../../../../components/UI/FullScreenLoader';
 import usePost from '../../../../hook/usePostFetch';
 import Alert from '../../../../services/Alert';
+import {useTranslation} from '../../../../i18n';
 
 interface Company {
   code: string;
@@ -29,53 +26,35 @@ interface CompanyOption {
   label: string;
   value: string;
   id?: string;
+  name?: string;
 }
-
-const initialState: Company[] = [];
 
 interface NewTranslateProps {
   setCurrentView: (view: string) => void;
 }
 
-const options = [
-  {id: '1', name: 'Juridica'},
-  {id: '2', name: 'Natural'},
-];
-
-export default function NewTranslate({setCurrentView}: any) {
+export default function NewTranslate({setCurrentView}: NewTranslateProps) {
+  const {t} = useTranslation();
   const [typeCompany, setTypeCompany] = useState('');
-  const {data, loading, error} = useGetFetch(
-    `/translation/getCompanies/${typeCompany}`,
-  );
+  const {data, loading} = useGetFetch(`/translation/getCompanies/${typeCompany}`);
   const [companies, setCompanies] = useState<CompanyOption[]>([]);
   const [inputCode, setInputCode] = useState('');
   const [fetchByCode, setFetchByCode] = useState(false);
-  const [companyTypeButtonText, setCompanyTypeButtonText] =
-    useState('Tipo de Empresa');
-  const [companyButtonText, setCompanyButtonText] = useState(
-    'Seleccionar Empresa',
-  );
-
+  const [companyTypeButtonText, setCompanyTypeButtonText] = useState('');
+  const [companyButtonText, setCompanyButtonText] = useState('');
   const [codeDataSucces, setCodeDataSucces] = useState(false);
-  const [companySelected, setCompanySelected] = useState<CompanyOption | null>(
-    null,
-  );
+  const [companySelected, setCompanySelected] = useState<CompanyOption | null>(null);
 
-  const userByCode = useGetFetch(
-    fetchByCode ? `/user/getByCode/${inputCode}` : '',
-  );
+  const options = [
+    {id: '1', name: t.juridica},
+    {id: '2', name: t.natural},
+  ];
 
+  const userByCode = useGetFetch(fetchByCode ? `/user/getByCode/${inputCode}` : '');
 
-  
-
-  const {
-    postData,
-    isLoading,
-    error: PostError,
-  } = usePost({
+  const {postData, isLoading} = usePost({
     onSuccess: () => {
-      console.log('Operación exitosa');
-      Alert.success('Codigo enviado con exito');
+      Alert.success(t.codeSentSuccess);
       setInputCode('');
       setCompanySelected(null);
       setCurrentView('home');
@@ -83,14 +62,9 @@ export default function NewTranslate({setCurrentView}: any) {
     onError: error => console.error('Error:', error),
   });
 
-  console.log(PostError, 'PostError');
-
   const handleStart = () => {
-    // Decide qué código enviar
     const codeToSend =
       inputCode.trim() !== '' ? inputCode.trim() : companySelected?.id;
-
-    // Si hay algo que enviar, usa el hook postData
     if (codeToSend && !isLoading) {
       postData('/translation/postTranslation', {code: codeToSend});
     }
@@ -107,10 +81,7 @@ export default function NewTranslate({setCurrentView}: any) {
   useEffect(() => {
     if (data && (data as any).companies) {
       const companyOptions: CompanyOption[] = (data as any).companies.map(
-        (company: Company) => ({
-          name: company.name,
-          id: company.code,
-        }),
+        (company: Company) => ({name: company.name, id: company.code}),
       );
       setCompanies(companyOptions);
     }
@@ -125,60 +96,49 @@ export default function NewTranslate({setCurrentView}: any) {
       setCompanies([{label: user.name, value: user.code}]);
       setCompanyButtonText(user.name);
       setCompanyTypeButtonText(user.type_company);
-      setFetchByCode(false); // Evita refetching
+      setFetchByCode(false);
     }
   }, [data, userByCode.data, fetchByCode]);
-
-
 
   return (
     <ScrollView
       style={styles.contentContainer}
-      contentContainerStyle={{
-        flexGrow: 1,
-
-        gap: 20,
-      }}>
+      contentContainerStyle={{flexGrow: 1, gap: 20}}>
       <Box>
-        <Text style={styles.textStyle}>Ingrese código:</Text>
+        <Text style={styles.textStyle}>{t.enterCodeLabel}</Text>
         <CustomInput
           disabled={companySelected !== null}
-          placeholder="Código"
+          placeholder={t.codePlaceholder}
           value={inputCode}
-          onChangeText={setInputCode} // Asegúrate de que CustomInput maneje onChangeText
+          onChangeText={setInputCode}
         />
       </Box>
       <TouchableOpacity style={styles.btn} onPress={handleSendCode}>
-        <Text style={styles.btnText}>Buscar</Text>
+        <Text style={styles.btnText}>{t.search}</Text>
       </TouchableOpacity>
 
       <Box>
-        <Text style={styles.textStyle}>Tipo de empresa:</Text>
+        <Text style={styles.textStyle}>{t.companyTypeLabel}</Text>
         <CustomSelectBottomSheet
-          textButton={companyTypeButtonText}
+          textButton={companyTypeButtonText || t.companyType}
           items={options}
           disabled={codeDataSucces}
-          onSelect={value => {
-            setTypeCompany(value.name);
-          }}
+          onSelect={value => setTypeCompany(value.name)}
         />
       </Box>
 
       <Box>
-        <Text style={styles.textStyle}>Empresa:</Text>
+        <Text style={styles.textStyle}>{t.companyLabel}</Text>
         <CustomSelectBottomSheet
           id="company"
-          textButton={companyButtonText} // Usa el estado para el texto del botón
+          textButton={companyButtonText || t.selectCompany}
           items={companies}
           loading={loading}
           disabled={codeDataSucces}
           onSelect={value => {
             setCompanySelected(value);
-            // Aquí deberías también actualizar el texto del botón si seleccionas una nueva empresa
-            const selectedCompany = companies.find(c => c.value === value);
-            if (selectedCompany) {
-              setCompanyButtonText(selectedCompany.label);
-            }
+            const selected = companies.find(c => c.value === value);
+            if (selected) setCompanyButtonText(selected.label || '');
           }}
         />
       </Box>
@@ -187,13 +147,13 @@ export default function NewTranslate({setCurrentView}: any) {
         style={[styles.btn, isStartDisabled && styles.disabledBtn]}
         onPress={handleStart}
         disabled={isStartDisabled}>
-        <Text style={styles.btnText}>Empezar</Text>
+        <Text style={styles.btnText}>{t.start}</Text>
       </TouchableOpacity>
 
       <TouchableOpacity
         style={styles.btnCancel}
         onPress={() => setCurrentView('home')}>
-        <Text style={styles.btnText}>Cancelar</Text>
+        <Text style={styles.btnText}>{t.cancel}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -218,19 +178,9 @@ const styles = StyleSheet.create({
     elevation: 5,
     gap: 20,
   },
-  textStyle: {
-    color: 'black',
-    fontSize: 15,
-    marginBottom: 5,
-  },
-  btn: {
-    backgroundColor: '#0373f3',
-    padding: 15,
-    borderRadius: 50,
-  },
-  disabledBtn: {
-    backgroundColor: '#CCCCCC', // un gris para indicar que el botón está deshabilitado
-  },
+  textStyle: {color: 'black', fontSize: 15, marginBottom: 5},
+  btn: {backgroundColor: '#0373f3', padding: 15, borderRadius: 50},
+  disabledBtn: {backgroundColor: '#CCCCCC'},
   btnCancel: {
     backgroundColor: '#f30303d8',
     padding: 10,
