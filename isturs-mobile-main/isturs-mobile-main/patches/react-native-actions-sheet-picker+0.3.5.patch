@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-actions-sheet-picker/src/components/Picker.tsx b/node_modules/react-native-actions-sheet-picker/src/components/Picker.tsx
+index a421d67..757dc72 100644
+--- a/node_modules/react-native-actions-sheet-picker/src/components/Picker.tsx
++++ b/node_modules/react-native-actions-sheet-picker/src/components/Picker.tsx
+@@ -62,7 +62,7 @@ export const Picker = <T,>({
+         setSelectedKey(index);
+       }}
+     >
+-      <Text style={{ fontWeight: selectedKey !== index ? 'normal' : 'bold' }}>
++      <Text style={{ fontWeight: selectedKey !== index ? 'normal' : 'bold', color:"black" }}>
+         {item.name ? item.name : null}
+       </Text>
+     </TouchableOpacity>

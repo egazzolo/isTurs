@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "333203457041",
+    "project_id": "isturs-6fded",
+    "storage_bucket": "isturs-6fded.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:333203457041:android:e7638b27270add3cf09db0",
+        "android_client_info": {
+          "package_name": "com.digsecvip.isturs"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAacFqRcjrDzpu00IHDAt0DdVDFKEap-sE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
