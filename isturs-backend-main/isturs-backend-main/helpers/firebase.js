@@ -1,9 +1,12 @@
 const admin = require('firebase-admin')
-const serviceAccount = require('../firebase-service-account.json')
 
 if (!admin.apps.length) {
   admin.initializeApp({
-    credential: admin.credential.cert(serviceAccount),
+    credential: admin.credential.cert({
+      projectId: process.env.FIREBASE_PROJECT_ID,
+      privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+    }),
   })
 }
 
@@ -15,9 +18,7 @@ const sendPushNotification = async (fcmToken, title, body) => {
       notification: { title, body },
       android: {
         priority: 'high',
-        notification: {
-          sound: 'default',
-        },
+        notification: { sound: 'default' },
       },
     })
   } catch (error) {
