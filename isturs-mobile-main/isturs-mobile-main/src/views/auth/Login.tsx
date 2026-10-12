@@ -91,7 +91,7 @@ export default function HomeScreen({navigation}: LoginScreenProps) {
   };
 
   return (
-    <ScrollView
+    <ScrollView automaticallyAdjustKeyboardInsets
       keyboardShouldPersistTaps="handled"
       contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}
       style={{flex: 1}}>
@@ -162,7 +162,6 @@ const styles = StyleSheet.create({
   },
   overlayContent: {
     alignItems: 'center',
-    position: 'absolute',
     paddingVertical: sizeMargin['spacing-m'],
     paddingHorizontal: sizeMargin['spacing-s'],
     gap: 30,

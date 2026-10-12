@@ -128,7 +128,7 @@ export default function RegisterCompany() {
   };
 
   return (
-    <ScrollView keyboardShouldPersistTaps="handled" style={{flex: 1}}>
+    <ScrollView automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled" style={{flex: 1}}>
       <Background xml={AppImages.BACKGROUND} darkOverlay />
       <View style={styles.container}>
         <View style={styles.titleContainer}>

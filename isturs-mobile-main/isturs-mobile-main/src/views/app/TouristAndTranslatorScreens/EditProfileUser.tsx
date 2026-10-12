@@ -69,7 +69,7 @@ export default function EditProfileUser() {
   return (
     <>
       <Background xml={AppImages.BACKGROUND} darkOverlay />
-      <ScrollView keyboardShouldPersistTaps="handled" style={{flex: 1}}>
+      <ScrollView automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled" style={{flex: 1}}>
         <View style={styles.container}>
           <View style={styles.titleContainer}>
             <Text style={styles.textTitle}>{t.edit} {userRole === "OPERATOR" ? t.operatorHomeRole : t.touristRole}</Text>

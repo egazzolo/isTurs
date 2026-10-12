@@ -130,7 +130,7 @@ export default function AceptTurists({turista,setSelectedTurista,refreshData}: a
   
 
   return (
-    <ScrollView keyboardShouldPersistTaps="handled" style={styles.overlayContent}>
+    <ScrollView automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled" style={styles.overlayContent}>
       <View style={{flex: 1, gap: 8,paddingBottom:60}}>
         <Text style={styles.title}>{t.touristAcceptance}</Text>
         <View style={styles.turistDetails}>

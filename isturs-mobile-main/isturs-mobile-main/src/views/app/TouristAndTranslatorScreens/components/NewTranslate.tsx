@@ -125,7 +125,7 @@ export default function NewTranslate({setCurrentView}: any) {
 
 
   return (
-    <ScrollView keyboardShouldPersistTaps="handled"
+    <ScrollView automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled"
       style={styles.contentContainer}
       contentContainerStyle={{
         flexGrow: 1,

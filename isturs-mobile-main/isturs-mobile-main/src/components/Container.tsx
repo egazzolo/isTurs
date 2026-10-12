@@ -32,7 +32,7 @@ export default function Container({
     return (
       <View style={styles.main}>
         <View style={styles.scrollContainer}>
-          <ScrollView keyboardShouldPersistTaps="handled" bounces={false} overScrollMode="never">
+          <ScrollView automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled" bounces={false} overScrollMode="never">
             {children}
           </ScrollView>
         </View>
