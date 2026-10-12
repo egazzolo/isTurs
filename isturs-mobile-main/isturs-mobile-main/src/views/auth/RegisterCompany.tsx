@@ -82,7 +82,12 @@ export default function RegisterCompany() {
       navigation.goBack();
       setFormState(initialFormState);
     },
-    onError: error => Alert.warning(error.response.data.errors[0].msg),
+    onError: error =>
+      Alert.warning(
+        error.response?.data?.errors?.[0]?.msg ??
+          error.response?.data?.msg ??
+          error.message,
+      ),
   });
 
   const handleSubmmit = () => {
@@ -116,7 +121,7 @@ export default function RegisterCompany() {
   };
 
   return (
-    <ScrollView style={{flex: 1}}>
+    <ScrollView keyboardShouldPersistTaps="handled" style={{flex: 1}}>
       <Background xml={AppImages.BACKGROUND} darkOverlay />
       <View style={styles.container}>
         <View style={styles.titleContainer}>

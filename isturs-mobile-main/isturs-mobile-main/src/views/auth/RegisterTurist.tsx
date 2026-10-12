@@ -73,7 +73,12 @@ export default function RegisterTurist() {
       navigation.goBack();
       setFormState(initialFormState);
     },
-    onError: error => Alert.warning(error.response.data.errors[0].msg),
+    onError: error =>
+      Alert.warning(
+        error.response?.data?.errors?.[0]?.msg ??
+          error.response?.data?.msg ??
+          error.message,
+      ),
   });
 
   const handleSubmmit = () => {
@@ -115,7 +120,7 @@ export default function RegisterTurist() {
   return (
     <>
       <Background xml={AppImages.BACKGROUND} darkOverlay />
-      <ScrollView style={{flex: 1}}>
+      <ScrollView keyboardShouldPersistTaps="handled" style={{flex: 1}}>
         <View style={styles.container}>
           <View style={styles.titleContainer}>
             <Text style={styles.textTitle}>Registro</Text>

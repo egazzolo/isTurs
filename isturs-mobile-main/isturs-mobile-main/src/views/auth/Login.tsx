@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
 import { selectToken, selectUser, selectUserRole, setSignIn, } from '../../redux/slices/auth.slice';
-import { View, Text, StyleSheet, TouchableOpacity, TextInput, Modal, Button, ScrollView, } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, } from 'react-native';
 import {RenderSvgXML} from '../../components/RenderSvgXML';
 import AppImages from '../../assets/icon';
 import {Background} from '../../components/Background/Background';
@@ -49,10 +49,6 @@ export default function HomeScreen({navigation}: LoginScreenProps) {
   const dispatch = useDispatch();
   const {t} = useTranslation();
   const [isModalVisible, setModalVisible] = useState(false);
-  const [selectedOption, setSelectedOption] = useState <
-    keyof AuthStackParamList | null
-  >(null);
-  const [accessCode, setAccessCode] = useState('');
 
   const [formState, setFormState] = useState(initialFormState);
   const [loginResponse, setLoginResponse] = useState<RegisterResponse | null>(
@@ -107,34 +103,16 @@ export default function HomeScreen({navigation}: LoginScreenProps) {
 
   const handleRegisterPress = () => {
     setModalVisible(true);
-    setAccessCode('');
   };
 
   const handleOptionSelect = (option: keyof AuthStackParamList) => {
-    setSelectedOption(option);
-    if (option === 'RegisterTuristScreen') {
-      navigation.navigate(option);
-      cleanUpStates();
-    }
-  };
-
-  const verifyAccessCode = () => {
-    if (accessCode === '54321' && selectedOption) {
-      navigation.navigate(selectedOption);
-      cleanUpStates();
-    } else {
-      console.log(t.incorrectCode);
-    }
-  };
-
-  const cleanUpStates = () => {
     setModalVisible(false);
-    setSelectedOption(null);
-    setAccessCode('');
+    navigation.navigate(option);
   };
 
   return (
     <ScrollView
+      keyboardShouldPersistTaps="handled"
       contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}
       style={{flex: 1}}>
       <Background xml={AppImages.BACKGROUND} darkOverlay />
@@ -170,37 +148,25 @@ export default function HomeScreen({navigation}: LoginScreenProps) {
           </TouchableOpacity>
           <LanguageSelector variant="light" />
         </View>
-        <CustomModal isVisible={isModalVisible} onClose={cleanUpStates}>
-          {!selectedOption && (
-            <>
-              <CustomButton
-                title={t.registerAsCompany}
-                onPress={() => handleOptionSelect('RegisterCompanyScreen')}
-                invert
-              />
-              <CustomButton
-                title={t.registerAsOperator}
-                onPress={() => handleOptionSelect('RegisterOperatorScreen')}
-                invert
-              />
-              <CustomButton
-                title={t.registerAsTourist}
-                onPress={() => handleOptionSelect('RegisterTuristScreen')}
-              />
-            </>
-          )}
-          {selectedOption && selectedOption !== 'RegisterTuristScreen' && (
-            <View>
-              <TextInput
-                placeholder={t.companyCode}
-                placeholderTextColor={'black'}
-                value={accessCode}
-                onChangeText={setAccessCode}
-                style={styles.input}
-              />
-              <Button title={t.confirm} onPress={verifyAccessCode} />
-            </View>
-          )}
+        <CustomModal
+          isVisible={isModalVisible}
+          onClose={() => setModalVisible(false)}>
+          <>
+            <CustomButton
+              title={t.registerAsCompany}
+              onPress={() => handleOptionSelect('RegisterCompanyScreen')}
+              invert
+            />
+            <CustomButton
+              title={t.registerAsOperator}
+              onPress={() => handleOptionSelect('RegisterOperatorScreen')}
+              invert
+            />
+            <CustomButton
+              title={t.registerAsTourist}
+              onPress={() => handleOptionSelect('RegisterTuristScreen')}
+            />
+          </>
         </CustomModal>
       </View>
       <FullScreenLoader visible={isLoading} />

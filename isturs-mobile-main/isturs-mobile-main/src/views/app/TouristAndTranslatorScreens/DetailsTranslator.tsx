@@ -214,7 +214,7 @@ const DetailsTranslator: React.FC<HomeScreenProps> = ({navigation, route}) => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView
+        <ScrollView keyboardShouldPersistTaps="handled"
           contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}
           style={{flex: 1}}>
           <View style={styles.viewContainer}>{renderActiveTab()}</View>

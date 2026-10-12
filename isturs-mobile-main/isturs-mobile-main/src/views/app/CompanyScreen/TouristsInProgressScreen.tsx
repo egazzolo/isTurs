@@ -106,7 +106,7 @@ const TouristsInProgressScreen: React.FC<HomeScreenProps> = ({navigation}) => {
       <View style={styles.contentContainer}>
         <Text style={styles.sectionHeader}>{t.touristsInProgress}</Text>
 
-        <FlatList
+        <FlatList keyboardShouldPersistTaps="handled"
           data={ProccesTurist?.turistProgress || []}
           renderItem={renderTrasladoItem}
           keyExtractor={item => item.id}

@@ -119,7 +119,7 @@ const HomeCompanyScreen: React.FC<HomeCompany> = ({navigation}) => {
 
   return (
     <>
-      <ScrollView contentContainerStyle={{flex: 1}}>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{flex: 1}}>
         <Icons
           onPress={logout}
           name="exit"
@@ -156,7 +156,7 @@ const HomeCompanyScreen: React.FC<HomeCompany> = ({navigation}) => {
             </View>
           </View>
 
-          <ScrollView
+          <ScrollView keyboardShouldPersistTaps="handled"
             style={styles.contentContainerElement}
             contentContainerStyle={{
               gap: 20,

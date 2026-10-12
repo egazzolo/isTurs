@@ -118,7 +118,7 @@ const HistoryScreen: React.FC<HomeScreenProps> = ({navigation}) => {
       
             <Text style={styles.sectionHeader}>{t.touristHistory}</Text>
 
-            <FlatList
+            <FlatList keyboardShouldPersistTaps="handled"
               data={data?.history}
               renderItem={renderTrasladoItem}
               keyExtractor={item => item.id}

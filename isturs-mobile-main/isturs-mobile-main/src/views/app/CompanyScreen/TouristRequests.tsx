@@ -125,7 +125,7 @@ const TouristRequests: React.FC<HomeScreenProps> = ({navigation}) => {
           <>
             <Text style={styles.sectionHeader}>{t.touristRequests}</Text>
 
-            <FlatList
+            <FlatList keyboardShouldPersistTaps="handled"
               data={dataTurist?.turistPending}
               renderItem={renderTrasladoItem}
               keyExtractor={item => item.id}

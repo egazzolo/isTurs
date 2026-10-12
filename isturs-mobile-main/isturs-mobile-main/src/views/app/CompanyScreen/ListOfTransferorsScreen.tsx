@@ -103,7 +103,7 @@ const ListOfTransferorsScreen: React.FC<HomeScreenProps> = ({navigation}) => {
       <View style={styles.contentContainer}>
         <Text style={styles.sectionHeader}>{t.driversList2}</Text>
 
-        <FlatList
+        <FlatList keyboardShouldPersistTaps="handled"
           data={TransladistData?.users}
           renderItem={renderTrasladoItem}
           keyExtractor={item => item.id}

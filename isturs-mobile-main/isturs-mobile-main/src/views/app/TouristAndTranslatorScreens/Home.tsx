@@ -177,7 +177,7 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
                 </>
               )}
               <Text style={styles.sectionHeader}>{t.recentTrips}</Text>
-              <FlatList
+              <FlatList keyboardShouldPersistTaps="handled"
                 data={trasladosData.filter(item => !item.enCurso)}
                 renderItem={renderTrasladoItem}
                 keyExtractor={item => item.id}

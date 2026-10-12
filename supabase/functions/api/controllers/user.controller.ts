@@ -92,6 +92,15 @@ export const userPOST = async (req: any, res: any) => {
       return res.status(400).json({ msg: 'Todos los campos son obligatorios.' })
     }
     try {
+      const { data: companyProfile } = await supabase
+        .from('profiles')
+        .select('id')
+        .eq('code', code)
+        .eq('role', 'COMPANY')
+        .maybeSingle()
+      if (!companyProfile) {
+        return res.status(400).json({ msg: 'Código de empresa no válido.' })
+      }
       const salt = bcryptjs.genSaltSync()
       const hashedPassword = bcryptjs.hashSync(password, salt)
       const { data: user, error } = await supabase

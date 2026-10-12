@@ -177,7 +177,7 @@ const Chat = ({data}: any) => {
           </Text>
         </View>
       )}
-      <FlatList
+      <FlatList keyboardShouldPersistTaps="handled"
         ref={flatListRef}
         data={messages}
         renderItem={renderMessageItem}
