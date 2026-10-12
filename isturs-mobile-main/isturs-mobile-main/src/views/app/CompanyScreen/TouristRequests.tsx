@@ -51,7 +51,7 @@ const TouristRequests: React.FC<HomeScreenProps> = ({navigation}) => {
     loading,
     error,
     refreshData
-  } = useGetFetch<Empty>(`translation/getMyRequest`);
+  } = useGetFetch<Empty>(`translation/getMyRequest`, {pollMs: 15000});
   const userData = useSelector(selectUser);
   const [selectedTurista, setSelectedTurista] = useState<TuristPending | null>(null);
 

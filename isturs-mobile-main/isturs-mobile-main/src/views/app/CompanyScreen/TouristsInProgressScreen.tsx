@@ -50,7 +50,7 @@ const TouristsInProgressScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     data: ProccesTurist,
     loading: IsLoadingProccesTurist,
     error: ErrorProccesTurist,
-  } = useGetFetch<EmptyTuristProgress>(`translation/getMyTuristProcess`);
+  } = useGetFetch<EmptyTuristProgress>(`translation/getMyTuristProcess`, {pollMs: 15000});
   const handleImageSelected = (image: Asset) => {
     console.log(image.uri);
   };

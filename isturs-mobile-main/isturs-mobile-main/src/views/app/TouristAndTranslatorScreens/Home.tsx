@@ -63,7 +63,7 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
   const endpoint = '/translation/myTranslations';
 
   const {data, loading, error, refreshData} =
-    useGetFetch<Translado>(endpoint);
+    useGetFetch<Translado>(endpoint, {pollMs: 15000});
 
   console.log(data, 'data');
 
