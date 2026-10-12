@@ -3,6 +3,9 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Modal, Button, } 
 import Pizarra from './components/Pizarra';
 import ProfileIMG from './components/ProfileIMG';
 import Chat from './components/Chat';
+import KeyboardAwareView from '../../../components/KeyboardAwareView/KeyboardAwareView';
+import KeyboardDoneBar from '../../../components/KeyboardDoneBar/KeyboardDoneBar';
+import usePullToRefresh from '../../../hook/usePullToRefresh';
 import {Background} from '../../../components/Background/Background';
 import AppImages from '../../../assets/icon';
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
@@ -50,9 +53,10 @@ const DetailsTranslator: React.FC<HomeScreenProps> = ({navigation, route}) => {
   console.log(route.params);
   const role = useSelector(selectUserRole);
   const [activeTab, setActiveTab] = useState('pizarra');
-  const {data, error, loading} = useGetFetch<TuristProgressMain>(
+  const {data, error, loading, reloadData} = useGetFetch<TuristProgressMain>(
     `/translation/getMyTranslate/${id}`,
   );
+  const refreshControl = usePullToRefresh(reloadData);
   const {postData} = usePost({
     onSuccess: () => {
       Alert.success(t.tripFinished);
@@ -157,6 +161,7 @@ const DetailsTranslator: React.FC<HomeScreenProps> = ({navigation, route}) => {
               </Text>
             </TouchableOpacity>
             <TouchableOpacity
+              onPress={() => setModalVisible(false)}
               style={{
                 backgroundColor: '#0373F3',
                 padding: 10,
@@ -214,11 +219,22 @@ const DetailsTranslator: React.FC<HomeScreenProps> = ({navigation, route}) => {
           </TouchableOpacity>
         </View>
 
-        <ScrollView automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled"
-          contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}
-          style={{flex: 1}}>
-          <View style={styles.viewContainer}>{renderActiveTab()}</View>
-        </ScrollView>
+        {activeTab === 'chat' ? (
+          // The chat scrolls itself and keeps its input line above the keyboard.
+          <KeyboardAwareView style={{flex: 1}}>
+            <View style={[styles.viewContainer, {flex: 1}]}>
+              {renderActiveTab()}
+            </View>
+          </KeyboardAwareView>
+        ) : (
+          <ScrollView automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled"
+            refreshControl={refreshControl}
+            contentContainerStyle={{flexGrow: 1, justifyContent: 'center'}}
+            style={{flex: 1}}>
+            <View style={styles.viewContainer}>{renderActiveTab()}</View>
+          </ScrollView>
+        )}
+        <KeyboardDoneBar />
         <FullScreenLoader visible={loading} />
       </View>
     );

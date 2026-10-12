@@ -1,7 +1,8 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { View, FlatList, Text, TextInput, TouchableOpacity, Image, StyleSheet, useWindowDimensions, Alert as RNAlert, } from 'react-native';
+import { View, FlatList, Text, TextInput, TouchableOpacity, Image, StyleSheet, Alert as RNAlert, } from 'react-native';
 import axiosClient from '../../../../api';
 import {useTranslation} from '../../../../i18n';
+import {KEYBOARD_DONE_ID} from '../../../../components/KeyboardDoneBar/KeyboardDoneBar';
 import {launchImageLibrary} from 'react-native-image-picker';
 import messaging from '@react-native-firebase/messaging';
 
@@ -13,7 +14,6 @@ const Chat = ({data}: any) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isChatVisible, setIsChatVisible] = useState(true);
   const chatId = data.turistProgress[0].chat_id;
-  const {height} = useWindowDimensions();
   const flatListRef = useRef<FlatList>(null);
   const lastMessageCount = useRef(0);
 
@@ -169,7 +169,7 @@ const Chat = ({data}: any) => {
   };
 
   return (
-    <View style={{...styles.container, height: height - 220}}>
+    <View style={[styles.container, {flex: 1}]}>
       {unreadCount > 0 && (
         <View style={styles.unreadBadge}>
           <Text style={styles.unreadText}>
@@ -197,6 +197,11 @@ const Chat = ({data}: any) => {
           value={inputText}
           onChangeText={setInputText}
           placeholder={t.typeMessage}
+          inputAccessoryViewID={KEYBOARD_DONE_ID}
+          // keep the latest messages visible once the keyboard has opened
+          onFocus={() =>
+            setTimeout(() => flatListRef.current?.scrollToEnd({animated: true}), 300)
+          }
           style={styles.input}
         />
         <TouchableOpacity onPress={sendMessage}>

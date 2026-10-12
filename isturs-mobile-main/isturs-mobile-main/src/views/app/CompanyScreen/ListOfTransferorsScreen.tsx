@@ -13,6 +13,7 @@ import ButtonOpacity from '../../../components/ButtonOpacity/ButtonOpacity';
 import {sizeMargin} from '../../../constants';
 import {Colors} from '../../../theme';
 import {EmptyTransladista, User} from './HomeCompanyScreen';
+import usePullToRefresh from '../../../hook/usePullToRefresh';
 import useGetFetch from '../../../hook/useGetFetch';
 import {formatDate} from '../../../utils/FormatDate';
 import {useTranslation} from '../../../i18n';
@@ -42,7 +43,9 @@ const ListOfTransferorsScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     data: TransladistData,
     loading: TransladistLoading,
     error: TransladistError,
+    reloadData,
   } = useGetFetch<EmptyTransladista>(`user/getMyTransfers`);
+  const refreshControl = usePullToRefresh(reloadData);
 
   console.log(TransladistData)
 
@@ -104,6 +107,7 @@ const ListOfTransferorsScreen: React.FC<HomeScreenProps> = ({navigation}) => {
         <Text style={styles.sectionHeader}>{t.driversList2}</Text>
 
         <FlatList keyboardShouldPersistTaps="handled"
+          refreshControl={refreshControl}
           data={TransladistData?.users}
           renderItem={renderTrasladoItem}
           keyExtractor={item => item.id}

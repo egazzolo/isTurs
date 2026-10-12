@@ -134,6 +134,7 @@ const es = {
   mobilePhone: 'Celular',
   legalEntity: 'Jurídica',
   naturalPerson: 'Natural',
+  done: 'Listo',
 };
 
 export default es;

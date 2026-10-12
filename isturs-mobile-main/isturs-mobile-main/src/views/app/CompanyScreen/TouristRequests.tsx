@@ -12,6 +12,7 @@ import ImagePicker from '../../../components/ImagePicker/ImagePicker';
 import ButtonOpacity from '../../../components/ButtonOpacity/ButtonOpacity';
 import {sizeMargin} from '../../../constants';
 import {Colors} from '../../../theme';
+import usePullToRefresh from '../../../hook/usePullToRefresh';
 import useGetFetch from '../../../hook/useGetFetch';
 import {Empty} from './HomeCompanyScreen';
 import {formatDate} from '../../../utils/FormatDate';
@@ -50,8 +51,10 @@ const TouristRequests: React.FC<HomeScreenProps> = ({navigation}) => {
     data: dataTurist,
     loading,
     error,
-    refreshData
+    refreshData,
+    reloadData,
   } = useGetFetch<Empty>(`translation/getMyRequest`, {pollMs: 15000});
+  const refreshControl = usePullToRefresh(reloadData);
   const userData = useSelector(selectUser);
   const [selectedTurista, setSelectedTurista] = useState<TuristPending | null>(null);
 
@@ -126,6 +129,7 @@ const TouristRequests: React.FC<HomeScreenProps> = ({navigation}) => {
             <Text style={styles.sectionHeader}>{t.touristRequests}</Text>
 
             <FlatList keyboardShouldPersistTaps="handled"
+              refreshControl={refreshControl}
               data={dataTurist?.turistPending}
               renderItem={renderTrasladoItem}
               keyExtractor={item => item.id}

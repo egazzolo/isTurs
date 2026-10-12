@@ -15,6 +15,7 @@ import {Colors} from '../../../theme';
 import Icon from 'react-native-vector-icons/Feather';
 import NewTranslate from './components/NewTranslate';
 import useGetFetch from '../../../hook/useGetFetch';
+import usePullToRefresh from '../../../hook/usePullToRefresh';
 import {formatSpanishDate} from '../../../utils/FormatSpanishDate';
 import Icons from 'react-native-vector-icons/Ionicons';
 import FullScreenLoader from '../../../components/UI/FullScreenLoader';
@@ -62,8 +63,9 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
 
   const endpoint = '/translation/myTranslations';
 
-  const {data, loading, error, refreshData} =
+  const {data, loading, error, refreshData, reloadData} =
     useGetFetch<Translado>(endpoint, {pollMs: 15000});
+  const refreshControl = usePullToRefresh(reloadData);
 
   console.log(data, 'data');
 
@@ -178,6 +180,7 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
               )}
               <Text style={styles.sectionHeader}>{t.recentTrips}</Text>
               <FlatList keyboardShouldPersistTaps="handled"
+                refreshControl={refreshControl}
                 data={trasladosData.filter(item => !item.enCurso)}
                 renderItem={renderTrasladoItem}
                 keyExtractor={item => item.id}
@@ -185,15 +188,17 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
               />
             </>
           ) : (
-            <Text
-              style={{
-                textAlign: 'center',
-                marginTop: 20,
-                fontSize: 18,
-                color: 'black',
-              }}>
-              {t.noTrips}
-            </Text>
+            <ScrollView refreshControl={refreshControl} style={{flex: 1}}>
+              <Text
+                style={{
+                  textAlign: 'center',
+                  marginTop: 20,
+                  fontSize: 18,
+                  color: 'black',
+                }}>
+                {t.noTrips}
+              </Text>
+            </ScrollView>
           )}
           {userRole === 'TURIST' && (
             <View

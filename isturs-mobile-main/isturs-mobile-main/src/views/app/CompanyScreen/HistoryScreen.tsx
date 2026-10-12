@@ -12,6 +12,7 @@ import ImagePicker from '../../../components/ImagePicker/ImagePicker';
 import ButtonOpacity from '../../../components/ButtonOpacity/ButtonOpacity';
 import {sizeMargin} from '../../../constants';
 import {Colors} from '../../../theme';
+import usePullToRefresh from '../../../hook/usePullToRefresh';
 import useGetFetch from '../../../hook/useGetFetch';
 import {Empty} from './HomeCompanyScreen';
 import {formatDate} from '../../../utils/FormatDate';
@@ -54,7 +55,8 @@ const HistoryScreen: React.FC<HomeScreenProps> = ({navigation}) => {
   const dispatch = useDispatch();
   const userData = useSelector(selectUser);
   const user = useSelector(selectUserProfile);
-  const { data, loading, error, } = useGetFetch<HistorialArray>(`/translation/getMyHistory`);
+  const { data, loading, error, reloadData } = useGetFetch<HistorialArray>(`/translation/getMyHistory`);
+  const refreshControl = usePullToRefresh(reloadData);
 
   console.log(data)
 
@@ -119,6 +121,7 @@ const HistoryScreen: React.FC<HomeScreenProps> = ({navigation}) => {
             <Text style={styles.sectionHeader}>{t.touristHistory}</Text>
 
             <FlatList keyboardShouldPersistTaps="handled"
+              refreshControl={refreshControl}
               data={data?.history}
               renderItem={renderTrasladoItem}
               keyExtractor={item => item.id}

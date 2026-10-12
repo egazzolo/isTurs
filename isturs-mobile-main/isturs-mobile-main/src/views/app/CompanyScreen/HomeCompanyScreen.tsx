@@ -16,6 +16,7 @@ import {Colors} from '../../../theme';
 import IconFontAwesome from 'react-native-vector-icons/FontAwesome';
 import {RenderSvgXML} from '../../../components/RenderSvgXML/index';
 import {SIZES} from '../../../constants/fonts';
+import usePullToRefresh from '../../../hook/usePullToRefresh';
 import useGetFetch from '../../../hook/useGetFetch';
 import Icons from 'react-native-vector-icons/Ionicons';
 import {useTranslation} from '../../../i18n';
@@ -82,21 +83,29 @@ const HomeCompanyScreen: React.FC<HomeCompany> = ({navigation}) => {
   const {t} = useTranslation();
 
   const dispatch = useDispatch();
-  const {data, loading, error, refreshData} = useGetFetch<Empty>(
+  const {data, loading, error, refreshData, reloadData} = useGetFetch<Empty>(
     `translation/getMyRequest`,
+    {pollMs: 15000},
   );
   const {
     data: TransladistData,
     loading: TransladistLoading,
     error: TransladistError,
     refreshData: refreshDataTransladist,
+    reloadData: reloadTransladist,
   } = useGetFetch<EmptyTransladista>(`user/getMyTransfers`);
   const {
     data: ProccesTurist,
     loading: IsLoadingProccesTurist,
     error: ErrorProccesTurist,
     refreshData: refreshDataProccesTurist,
-  } = useGetFetch<EmptyTuristProgress>(`translation/getMyTuristProcess`);
+    reloadData: reloadProccesTurist,
+  } = useGetFetch<EmptyTuristProgress>(`translation/getMyTuristProcess`, {pollMs: 15000});
+  const refreshControl = usePullToRefresh(
+    reloadData,
+    reloadTransladist,
+    reloadProccesTurist,
+  );
   const user = useSelector(selectUserProfile);
   const userData = useSelector(selectUser);
 
@@ -119,7 +128,7 @@ const HomeCompanyScreen: React.FC<HomeCompany> = ({navigation}) => {
 
   return (
     <>
-      <ScrollView automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled" contentContainerStyle={{flex: 1}}>
+      <ScrollView automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled" refreshControl={refreshControl} contentContainerStyle={{flex: 1}}>
         <Icons
           onPress={logout}
           name="exit"
@@ -157,6 +166,7 @@ const HomeCompanyScreen: React.FC<HomeCompany> = ({navigation}) => {
           </View>
 
           <ScrollView automaticallyAdjustKeyboardInsets keyboardShouldPersistTaps="handled"
+            refreshControl={refreshControl}
             style={styles.contentContainerElement}
             contentContainerStyle={{
               gap: 20,

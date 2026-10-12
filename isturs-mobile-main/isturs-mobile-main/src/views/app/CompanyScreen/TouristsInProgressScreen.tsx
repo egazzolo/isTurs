@@ -12,6 +12,7 @@ import ImagePicker from '../../../components/ImagePicker/ImagePicker';
 import ButtonOpacity from '../../../components/ButtonOpacity/ButtonOpacity';
 import {sizeMargin} from '../../../constants';
 import {Colors} from '../../../theme';
+import usePullToRefresh from '../../../hook/usePullToRefresh';
 import useGetFetch from '../../../hook/useGetFetch';
 import {useTranslation} from '../../../i18n';
 
@@ -50,7 +51,9 @@ const TouristsInProgressScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     data: ProccesTurist,
     loading: IsLoadingProccesTurist,
     error: ErrorProccesTurist,
+    reloadData,
   } = useGetFetch<EmptyTuristProgress>(`translation/getMyTuristProcess`, {pollMs: 15000});
+  const refreshControl = usePullToRefresh(reloadData);
   const handleImageSelected = (image: Asset) => {
     console.log(image.uri);
   };
@@ -107,6 +110,7 @@ const TouristsInProgressScreen: React.FC<HomeScreenProps> = ({navigation}) => {
         <Text style={styles.sectionHeader}>{t.touristsInProgress}</Text>
 
         <FlatList keyboardShouldPersistTaps="handled"
+          refreshControl={refreshControl}
           data={ProccesTurist?.turistProgress || []}
           renderItem={renderTrasladoItem}
           keyExtractor={item => item.id}

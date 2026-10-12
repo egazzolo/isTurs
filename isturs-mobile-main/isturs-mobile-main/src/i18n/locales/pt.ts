@@ -134,6 +134,7 @@ const pt = {
   mobilePhone: 'Celular',
   legalEntity: 'Pessoa jurídica',
   naturalPerson: 'Pessoa física',
+  done: 'Concluído',
 };
 
 export default pt;

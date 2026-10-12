@@ -7,6 +7,7 @@ import usePut from '../../../../hook/usePut';
 import { useSelector } from 'react-redux';
 import { selectUserRole } from '../../../../redux/slices/auth.slice';
 import {useTranslation} from '../../../../i18n';
+import {KEYBOARD_DONE_ID} from '../../../../components/KeyboardDoneBar/KeyboardDoneBar';
 
 export default function Pizarra({data,refreshData}: any) {
   const {t} = useTranslation();
@@ -56,6 +57,8 @@ const handleSubmit = async () => {
         placeholder={t.enterText}
         placeholderTextColor="#00000089"
         containerStyle={styles.customInput}
+        inputAccessoryViewID={KEYBOARD_DONE_ID}
+        returnKeyType="done"
       />
 
       <TouchableOpacity style={styles.botonGuardar} onPress={handleSubmit}>

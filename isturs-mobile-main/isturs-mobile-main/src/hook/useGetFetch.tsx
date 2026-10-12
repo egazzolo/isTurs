@@ -17,7 +17,10 @@ interface FetchOptions {
 function useGetFetch<T>(
   endpoint: string,
   options?: FetchOptions,
-): FetchState<T> & { refreshData: () => Promise<void> } {
+): FetchState<T> & {
+  refreshData: () => Promise<void>;
+  reloadData: () => Promise<void>;
+} {
   const [state, setState] = useState<FetchState<T>>({
     data: null,
     loading: true,
@@ -71,7 +74,10 @@ function useGetFetch<T>(
     return fetchData();
   }, [fetchData]);
 
-  return { ...state, refreshData };
+  // Like refreshData but without the full-screen loader (used by pull-to-refresh).
+  const reloadData = useCallback(() => fetchData(true), [fetchData]);
+
+  return { ...state, refreshData, reloadData };
 }
 
 export default useGetFetch;
