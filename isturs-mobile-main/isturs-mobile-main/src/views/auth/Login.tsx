@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import {useDispatch, useSelector} from 'react-redux';
-import { selectToken, selectUser, selectUserRole, setSignIn, } from '../../redux/slices/auth.slice';
+import { selectToken, selectUser, selectUserRole, } from '../../redux/slices/auth.slice';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, } from 'react-native';
 import {RenderSvgXML} from '../../components/RenderSvgXML';
 import AppImages from '../../assets/icon';
@@ -17,8 +17,7 @@ import Alert from '../../services/Alert';
 import FullScreenLoader from '../../components/UI/FullScreenLoader';
 import {useTranslation} from '../../i18n';
 import LanguageSelector from '../../components/LanguageSelector/LanguageSelector';
-import messaging from '@react-native-firebase/messaging';
-import axiosClient from '../../api';
+import {completeSignIn} from '../../services/session';
 
 type LoginScreenProps = NativeStackScreenProps<AuthStackParamList, 'Login'>;
 
@@ -36,9 +35,6 @@ export interface Usuario {
   id: string;
   imageUrl: string;
 }
-
-const IMAGE_URL_PLACEHOLDER =
-  'https://surgassociates.com/wp-content/uploads/610-6104451_image-placeholder-png-user-profile-placeholder-image-png.jpg';
 
 const initialFormState = {
   username: '',
@@ -74,23 +70,7 @@ export default function HomeScreen({navigation}: LoginScreenProps) {
   useEffect(() => {
     if (!isLoading && data) {
       Alert.success(t.loginSuccess);
-      dispatch(
-        setSignIn({
-          usuario: {
-            ...data.usuario,
-            imageUrl: IMAGE_URL_PLACEHOLDER,
-          },
-          token: data.token,
-        }),
-      );
-      messaging()
-        .getToken()
-        .then(fcmToken => {
-          if (fcmToken) {
-            axiosClient.post('/chats/saveFcmToken', {fcmToken});
-          }
-        })
-        .catch(err => console.log('FCM token error:', err));
+      completeSignIn(dispatch, data);
     }
   }, [data, isLoading, navigation, dispatch]);
 

@@ -13,6 +13,7 @@ import usePost from '../../hook/usePostFetch';
 import {useDispatch} from 'react-redux';
 import {showToast} from '../../redux/slices/toast.slice';
 import Alert from '../../services/Alert';
+import {signIn} from '../../services/session';
 import {useNavigation} from '@react-navigation/native';
 import FullScreenLoader from '../../components/UI/FullScreenLoader';
 import {useTranslation} from '../../i18n';
@@ -55,6 +56,7 @@ const initialFormState = {
 export default function RegisterTurist() {
 
   const {t} = useTranslation();
+  const dispatch = useDispatch();
   const navigation = useNavigation();
 
   const [formState, setFormState] = useState(initialFormState);
@@ -70,8 +72,10 @@ export default function RegisterTurist() {
   const {postData, data, isLoading, error} = usePost<RegisterResponse>({
     onSuccess: () => {
       Alert.success(t.registerSuccess);
-      navigation.goBack();
-      setFormState(initialFormState);
+      // Sign the new user in; fall back to the login screen if that fails.
+      signIn(dispatch, formState.username, formState.password).catch(() =>
+        navigation.goBack(),
+      );
     },
     onError: error =>
       Alert.warning(
