@@ -27,10 +27,10 @@ interface TuristProgressMain {
 }
 
 export interface TuristProgress {
-  _id: string;
+  id: string;
   state: string;
   chart: string;
-  turist_IMG: string;
+  turist_img: string;
   code: string;
   create_at: Date;
   turist_name: string;
@@ -71,7 +71,7 @@ const DetailsTranslator: React.FC<HomeScreenProps> = ({navigation, route}) => {
 
   const handleFinishTranslado = () => {
     postData('/translation/finishTranslate', {
-      id_translation: data?.turistProgress[0]._id,
+      id_translation: data?.turistProgress[0].id,
     });
   };
 

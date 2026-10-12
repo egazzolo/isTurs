@@ -1,0 +1,6 @@
+project_id = "ntpjtaziujjdfdumjbsk"
+
+# The app sends its own token in the access_token header, not a Supabase JWT,
+# so the gateway's JWT check must be off for this function.
+[functions.api]
+verify_jwt = false

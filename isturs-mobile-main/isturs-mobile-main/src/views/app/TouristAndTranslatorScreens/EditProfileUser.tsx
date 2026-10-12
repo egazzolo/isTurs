@@ -62,7 +62,7 @@ export default function EditProfileUser() {
 
   
     const { confirmPassword, ...updateData } = formState;
-    putData(`/user/${userData?.uid}`, updateData);
+    putData(`/user/${userData?.id}`, updateData);
   };
 
 

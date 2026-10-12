@@ -1,6 +1,6 @@
 import { scale } from "../utils/scalingUtils";
 
-export const API_URL = 'https://isturs-production.up.railway.app/api';
+export const API_URL = 'https://ntpjtaziujjdfdumjbsk.supabase.co/functions/v1/api';
 
 export const Images = {
   // animations

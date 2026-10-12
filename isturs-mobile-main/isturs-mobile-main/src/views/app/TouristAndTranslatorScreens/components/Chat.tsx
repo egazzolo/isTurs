@@ -12,7 +12,7 @@ const Chat = ({data}: any) => {
   const [isFirstLoad, setIsFirstLoad] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isChatVisible, setIsChatVisible] = useState(true);
-  const chatId = data.turistProgress[0]._id;
+  const chatId = data.turistProgress[0].chat_id;
   const {height} = useWindowDimensions();
   const flatListRef = useRef<FlatList>(null);
   const lastMessageCount = useRef(0);

@@ -33,7 +33,7 @@ export default function Pizarra({data,refreshData}: any) {
 
 const handleSubmit = async () => {
   putData(`/translation/editTranslation`,{
-    id_translation: data.turistProgress[0]._id,
+    id_translation: data.turistProgress[0].id,
     chart: texto,
   })
 }

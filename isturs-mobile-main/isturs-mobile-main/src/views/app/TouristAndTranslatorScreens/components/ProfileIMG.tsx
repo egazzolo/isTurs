@@ -42,7 +42,7 @@ export default function ProfileIMG({ data }: any) {
   useEffect(() => {
     if (base64Img) {
       const payload = {
-        id_translation: turistInfo._id,
+        id_translation: turistInfo.id,
         image: base64Img,
       };
       postData('/uphold/editUpholdImage', payload);
@@ -51,14 +51,14 @@ export default function ProfileIMG({ data }: any) {
 
   const getProfileImage = () => {
     return userRole === 'OPERATOR'
-      ? turistInfo.turist_IMG
+      ? turistInfo.turist_img
       : turistInfo.operator_IMG;
   };
 
   const getImageToUpload = () => {
     return userRole === 'OPERATOR'
       ? turistInfo.operator_IMG
-      : turistInfo.turist_IMG;
+      : turistInfo.turist_img;
   };
 
   const handleImagePress = () => {

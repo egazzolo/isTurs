@@ -30,10 +30,10 @@ import {useTranslation} from '../../../i18n';
 }
 
 export interface History {
-    _id:           string;
+    id:           string;
     state:         string;
     chart:         string;
-    turist_IMG:    string;
+    turist_img:    string;
     code:          string;
     create_at:     Date;
     turist_name:   string;
@@ -66,7 +66,7 @@ const HistoryScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     return (
       <View style={styles.trasladoItem}>
         <Image
-          source={{uri: item.turist_IMG}}
+          source={{uri: item.turist_img}}
           style={styles.image}
         />
         <View style={styles.infoContainer}>
@@ -121,7 +121,7 @@ const HistoryScreen: React.FC<HomeScreenProps> = ({navigation}) => {
             <FlatList
               data={data?.history}
               renderItem={renderTrasladoItem}
-              keyExtractor={item => item._id}
+              keyExtractor={item => item.id}
               style={styles.flatList}
             />
           

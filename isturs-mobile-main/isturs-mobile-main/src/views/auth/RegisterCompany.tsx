@@ -30,7 +30,7 @@ interface RegisterResponse {
   type_company: string;
   company: string;
   role: string;
-  uid: string;
+  id: string;
 }
 
 const options = [

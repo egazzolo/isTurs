@@ -33,7 +33,7 @@ export interface Usuario {
   phone: string;
   username: string;
   role: string;
-  uid: string;
+  id: string;
   imageUrl: string;
 }
 

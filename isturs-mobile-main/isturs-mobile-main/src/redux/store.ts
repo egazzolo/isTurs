@@ -4,8 +4,20 @@ import ToastReducer from '../redux/slices/toast.slice';
 import AppReducer from '../redux/slices/app.slice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {combineReducers} from 'redux';
-import {persistReducer} from 'redux-persist';
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
+import {persistReducer, createMigrate} from 'redux-persist';
+import {TypedUseSelectorHook, useDispatch, useSelector} from 'react-redux';
+
+const migrations = {
+  1: (state: any) => {
+    return {
+      ...state,
+      appState: {
+        ...state.appState,
+        language: state.appState?.language ?? 'es',
+      },
+    };
+  },
+};
 
 const reducers = combineReducers({
   authState: AuthReducer,
@@ -16,8 +28,9 @@ const reducers = combineReducers({
 const persistConfig = {
   key: 'root',
   storage: AsyncStorage,
-  toastSlice: ToastReducer,
-  whitelist: ['authState', 'appState',"toastSlice"],
+  version: 1,
+  migrate: createMigrate(migrations, {debug: false}),
+  whitelist: ['authState', 'appState', 'toastSlice'],
   blacklist: [],
 };
 
@@ -32,13 +45,8 @@ const store = configureStore({
     }),
 });
 
-
 export type RootState = ReturnType<typeof store.getState>;
-
-
 export type AppDispatch = typeof store.dispatch;
-
-
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
 

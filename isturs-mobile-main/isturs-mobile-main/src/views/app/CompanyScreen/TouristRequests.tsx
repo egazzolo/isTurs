@@ -33,7 +33,7 @@ type Traslado = {
 };
 
 export interface TuristPending{
-  _id:       string;
+  id:       string;
   state:     string;
   chart:     string;
   code:      string;
@@ -128,7 +128,7 @@ const TouristRequests: React.FC<HomeScreenProps> = ({navigation}) => {
             <FlatList
               data={dataTurist?.turistPending}
               renderItem={renderTrasladoItem}
-              keyExtractor={item => item._id}
+              keyExtractor={item => item.id}
               style={styles.flatList}
             />
           </>

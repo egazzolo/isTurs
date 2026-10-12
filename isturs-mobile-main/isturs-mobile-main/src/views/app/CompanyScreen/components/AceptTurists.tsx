@@ -66,7 +66,7 @@ export default function AceptTurists({turista,setSelectedTurista,refreshData}: a
 
   const OptionsTransladitas = (data as any)?.users?.map((item: any) => {
     return {
-      id: item.uid,
+      id: item.id,
       name: item.name,
     };
   });
@@ -110,7 +110,7 @@ export default function AceptTurists({turista,setSelectedTurista,refreshData}: a
     const payload = {
       turist_id: turista.turist_id,
       transfer_id: formState.empresa,
-      id_translation: turista._id,
+      id_translation: turista.id,
       origin: formState.origen,
       destination: formState.destino,
       date: formState.fecha,

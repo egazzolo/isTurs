@@ -10,7 +10,7 @@ interface Usuario {
   phone: string;
   username: string;
   role: string;
-  uid: string;
+  id: string;
   imageUrl: string;
   type_company?: string;
   profile_img?: string;

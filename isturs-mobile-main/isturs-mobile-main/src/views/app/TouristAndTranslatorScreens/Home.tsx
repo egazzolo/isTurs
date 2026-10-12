@@ -28,7 +28,7 @@ export interface Translado {
 }
 
 export interface Translation {
-  _id: string;
+  id: string;
   state: string;
   chart: string;
   code: string;
@@ -42,8 +42,7 @@ export interface Translation {
   image: any;
   enCurso: boolean;
   empresa: string;
-  id: string;
-  turist_IMG: string;
+  turist_img: string;
   hour: string;
 }
 
@@ -100,7 +99,7 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
       <View
         style={item.enCurso ? styles.activeTrasladoItem : styles.trasladoItem}>
         <Image
-          source={{uri: item.turist_IMG}}
+          source={{uri: item.turist_img}}
           style={item.enCurso ? styles.activeImage : styles.image}
         />
         <View style={styles.infoContainer}>
@@ -113,7 +112,7 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
         </View>
         <TouchableOpacity
           style={styles.iconContainer}
-          onPress={() => handleNavigation(item._id)}>
+          onPress={() => handleNavigation(item.id)}>
           <Icon name="send" size={item.enCurso ? 25 : 20} color="#ffffff" />
         </TouchableOpacity>
       </View>
@@ -181,7 +180,7 @@ const Home: React.FC<HomeScreenProps> = ({navigation}) => {
               <FlatList
                 data={trasladosData.filter(item => !item.enCurso)}
                 renderItem={renderTrasladoItem}
-                keyExtractor={item => item._id}
+                keyExtractor={item => item.id}
                 style={styles.flatList}
               />
             </>

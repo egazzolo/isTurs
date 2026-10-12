@@ -32,7 +32,7 @@ export interface Empty {
 
 export interface TuristPending {
   __v: number;
-  _id: string;
+  id: string;
   chart: string;
   code: string;
   create_at: Date;
@@ -53,7 +53,7 @@ export interface User {
   type_company: string;
   company: string;
   role: string;
-  uid: string;
+  id: string;
   profile_img: string;
 }
 
@@ -63,7 +63,7 @@ export interface EmptyTuristProgress {
 }
 
 export interface TuristProgress {
-  _id: string;
+  id: string;
   state: string;
   chart: string;
   code: string;

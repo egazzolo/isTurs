@@ -106,7 +106,7 @@ const ListOfTransferorsScreen: React.FC<HomeScreenProps> = ({navigation}) => {
         <FlatList
           data={TransladistData?.users}
           renderItem={renderTrasladoItem}
-          keyExtractor={item => item.uid}
+          keyExtractor={item => item.id}
           style={styles.flatList}
         />
       </View>

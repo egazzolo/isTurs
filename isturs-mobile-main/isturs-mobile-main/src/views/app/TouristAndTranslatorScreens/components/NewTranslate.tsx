@@ -17,7 +17,7 @@ interface Company {
   code: string;
   name: string;
   type_company: string;
-  uid: string;
+  id: string;
 }
 
 interface CompanyOption {

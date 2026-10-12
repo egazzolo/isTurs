@@ -25,7 +25,7 @@ export interface EmptyTuristProgress {
 }
 
 export interface TuristProgress {
-  _id: string;
+  id: string;
   state: string;
   chart: string;
   code: string;
@@ -37,7 +37,7 @@ export interface TuristProgress {
   origin: string;
   transfer_id: string;
   turist_id?: string;
-  turist_IMG: string;
+  turist_img: string;
 }
 
 
@@ -61,7 +61,7 @@ const TouristsInProgressScreen: React.FC<HomeScreenProps> = ({navigation}) => {
     return (
       <View
         style={styles.trasladoItem}>
-        <Image source={{uri: item.turist_IMG}} style={styles.image} />
+        <Image source={{uri: item.turist_img}} style={styles.image} />
         <View style={styles.infoContainer}>
           <Text style={styles.title}>{item.turist_name}</Text>
           <Text style={styles.empresa}>
@@ -109,7 +109,7 @@ const TouristsInProgressScreen: React.FC<HomeScreenProps> = ({navigation}) => {
         <FlatList
           data={ProccesTurist?.turistProgress || []}
           renderItem={renderTrasladoItem}
-          keyExtractor={item => item._id}
+          keyExtractor={item => item.id}
           style={styles.flatList}
         />
       
