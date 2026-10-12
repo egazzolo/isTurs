@@ -2,6 +2,7 @@ import { Router } from 'npm:express@4.19.2'
 import { check } from 'npm:express-validator@7.0.1'
 import { userGET, userPOST, userPUT, getByCode, getById, getMyTransfers } from '../controllers/user.controller.ts'
 import { validarCampos, validarJWT } from '../middlewares/index.ts'
+import { tr } from '../helpers/i18n.ts'
 import { validateRole, emailExist, userExist, phoneExist, rucExist, codeExist } from '../helpers/db-validators.ts'
 
 const router = Router()
@@ -12,16 +13,16 @@ router.get('/', [
 ], userGET)
 
 router.post('/', [
-  check('name', 'El campo "name" es obligatorio').not().isEmpty(),
-  check('password', 'El campo "password" debe ser mayor a 6 caracteres').isLength({ min: 6 }),
-  check('email', 'El campo "email" no es válido').custom(emailExist),
-  check('role', 'El campo "role" es obligatorio').not().isEmpty(),
-  check('role', 'No es un rol permitido').custom(validateRole),
-  check('username', 'El campo "username" es obligatorio').not().isEmpty(),
-  check('username', 'El username no es válido').custom(userExist),
-  check('phone', 'No es un teléfono permitido').custom(phoneExist),
-  check('ruc', 'No es un RUC permitido').custom(rucExist),
-  check('code', 'No es un Code permitido').custom(codeExist),
+  check('name', (_v: any, { req }: any) => tr(req, 'nameRequired')).not().isEmpty(),
+  check('password', (_v: any, { req }: any) => tr(req, 'passwordTooShort')).isLength({ min: 6 }),
+  check('email').custom(emailExist),
+  check('role', (_v: any, { req }: any) => tr(req, 'invalidRole')).not().isEmpty(),
+  check('role').custom(validateRole),
+  check('username', (_v: any, { req }: any) => tr(req, 'usernameRequired')).not().isEmpty(),
+  check('username').custom(userExist),
+  check('phone').custom(phoneExist),
+  check('ruc').custom(rucExist),
+  check('code').custom(codeExist),
   validarCampos
 ], userPOST)
 

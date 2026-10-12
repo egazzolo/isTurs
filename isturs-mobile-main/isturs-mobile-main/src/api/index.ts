@@ -19,6 +19,8 @@ axiosClient.interceptors.request.use(function (config) {
   if (token) {
     config.headers['access_token'] = `${token}`;
   }
+  // Lets the server answer with messages in the app's language.
+  config.headers['Accept-Language'] = state.appState.language;
   return config;
 });
 

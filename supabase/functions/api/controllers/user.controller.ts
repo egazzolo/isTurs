@@ -1,5 +1,6 @@
 import bcryptjs from 'npm:bcryptjs@2.4.3'
 import supabase from '../database/config.ts'
+import { tr } from '../helpers/i18n.ts'
 import { codeGenerate, verificarUnicidad } from '../helpers/index.ts'
 
 export const userGET = async (_req: any, res: any) => {
@@ -46,7 +47,7 @@ export const userPOST = async (req: any, res: any) => {
   if (role === 'TURIST') {
     const { name, email, phone, username, password } = req.body
     if (!name || !email || !phone || !username || !password) {
-      return res.status(400).json({ msg: 'Todos los campos son obligatorios.' })
+      return res.status(400).json({ msg: tr(req, 'allFieldsRequired') })
     }
     try {
       const salt = bcryptjs.genSaltSync()
@@ -60,14 +61,14 @@ export const userPOST = async (req: any, res: any) => {
       return res.json(user)
     } catch (error) {
       console.log(error)
-      return res.status(500).json({ msg: 'Error de Servidor' })
+      return res.status(500).json({ msg: tr(req, 'serverError') })
     }
   }
 
   if (role === 'COMPANY') {
     const { name, company_name, phone, username, password, ruc, type_company } = req.body
     if (!name || !company_name || !phone || !username || !password || !ruc || !type_company) {
-      return res.status(400).json({ msg: 'Todos los campos son obligatorios.' })
+      return res.status(400).json({ msg: tr(req, 'allFieldsRequired') })
     }
     try {
       const code = codeGenerate(8)
@@ -82,16 +83,27 @@ export const userPOST = async (req: any, res: any) => {
       return res.json(user)
     } catch (error) {
       console.log(error)
-      return res.status(500).json({ msg: 'Error de Servidor' })
+      return res.status(500).json({ msg: tr(req, 'serverError') })
     }
   }
 
   if (role === 'OPERATOR') {
-    const { name, email, company, code, type_company, username, password } = req.body
-    if (!name || !company || !email || !username || !password || !code || !type_company) {
-      return res.status(400).json({ msg: 'Todos los campos son obligatorios.' })
+    const { name, email, code, type_company, username, password } = req.body
+    if (!name || !email || !username || !password || !code || !type_company) {
+      return res.status(400).json({ msg: tr(req, 'allFieldsRequired') })
     }
     try {
+      // Older app builds don't send the company name; take it from the company the code belongs to.
+      let { company } = req.body
+      if (!company) {
+        const { data: companyProfile } = await supabase
+          .from('profiles')
+          .select('company_name, name')
+          .eq('code', code)
+          .eq('role', 'COMPANY')
+          .maybeSingle()
+        company = companyProfile?.company_name ?? companyProfile?.name ?? ''
+      }
       const salt = bcryptjs.genSaltSync()
       const hashedPassword = bcryptjs.hashSync(password, salt)
       const { data: user, error } = await supabase
@@ -103,11 +115,11 @@ export const userPOST = async (req: any, res: any) => {
       return res.json(user)
     } catch (error) {
       console.log(error)
-      return res.status(500).json({ msg: 'Error de Servidor' })
+      return res.status(500).json({ msg: tr(req, 'serverError') })
     }
   }
 
-  return res.status(400).json({ msg: 'Rol no válido' })
+  return res.status(400).json({ msg: tr(req, 'invalidRole') })
 }
 
 export const userPUT = async (req: any, res: any) => {

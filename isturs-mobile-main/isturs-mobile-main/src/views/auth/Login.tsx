@@ -62,9 +62,12 @@ export default function HomeScreen({navigation}: LoginScreenProps) {
 
   const {postData, data, isLoading, error} = usePost<RegisterResponse>({
     onSuccess: () => {},
-    onError: (error) => {
-      Alert.warning(error.response.data.msg);
-    },
+    onError: error =>
+      Alert.warning(
+        error.response?.data?.errors?.[0]?.msg ??
+          error.response?.data?.msg ??
+          error.message,
+      ),
   });
 
   useEffect(() => {

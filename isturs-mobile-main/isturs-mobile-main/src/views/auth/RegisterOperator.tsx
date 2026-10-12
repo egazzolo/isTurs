@@ -33,15 +33,15 @@ interface RegisterResponse {
 const areAllFieldsFilled = (state: any) => {
   const requiredFields = [
     'companyName',
-    'socialReason',
+    'email',
     'ruc',
-    'cellphone',
+    'code',
     'username',
     'password',
     'confirmPassword',
   ];
 
-  return requiredFields.every(field => state[field]?.trim() !== '');
+  return requiredFields.every(field => state[field].trim() !== '');
 };
 
 const initialFormState = {
@@ -118,7 +118,7 @@ console.log(formState)
       email: formState.email,
       code: formState.code,
       type_company: typeCompany,
-      // company: formState.socialReason,
+      company: formState.ruc,
       username: formState.username,
       password: formState.password,
     });

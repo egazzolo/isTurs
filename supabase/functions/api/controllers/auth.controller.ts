@@ -1,5 +1,6 @@
 import bcryptjs from 'npm:bcryptjs@2.4.3'
 import supabase from '../database/config.ts'
+import { tr } from '../helpers/i18n.ts'
 import { generarJWT, verificarJWT } from '../helpers/jwt.ts'
 
 export const login = async (req: any, res: any) => {
@@ -13,12 +14,12 @@ export const login = async (req: any, res: any) => {
       .single()
 
     if (error || !usuario) {
-      return res.status(400).json({ msg: 'Usuario / Contraseña no son correctos - Usuario' })
+      return res.status(400).json({ msg: tr(req, 'wrongCredentials') })
     }
 
     const validPassword = bcryptjs.compareSync(password, usuario.password)
     if (!validPassword) {
-      return res.status(400).json({ msg: 'Usuario / Contraseña no son correctos - Password' })
+      return res.status(400).json({ msg: tr(req, 'wrongCredentials') })
     }
 
     const token = await generarJWT(usuario.id)
@@ -27,7 +28,7 @@ export const login = async (req: any, res: any) => {
     res.json({ usuario: usuarioSinPassword, token })
   } catch (error) {
     console.log(error)
-    res.status(500).json({ msg: 'Ocurrió un error' })
+    res.status(500).json({ msg: tr(req, 'serverError') })
   }
 }
 
