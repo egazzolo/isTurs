@@ -128,6 +128,12 @@ const es = {
   enterDestination: 'Ingrese lugar de destino',
   operationSuccess: 'Operación exitosa',
   newMessages: 'nuevos mensajes',
+  tradeName: 'Nombre Comercial',
+  legalName: 'Razón Social',
+  taxId: 'RUC',
+  mobilePhone: 'Celular',
+  legalEntity: 'Jurídica',
+  naturalPerson: 'Natural',
 };
 
 export default es;

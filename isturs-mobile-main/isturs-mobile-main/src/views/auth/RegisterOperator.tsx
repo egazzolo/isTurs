@@ -28,10 +28,6 @@ interface RegisterResponse {
   id: string;
 }
 
-const options = [
-  {id: '1', name: 'Juridica'},
-  {id: '2', name: 'Natural'},
-];
 
 const areAllFieldsFilled = (state: any) => {
   const requiredFields = [
@@ -64,6 +60,11 @@ export default function RegisterOperator() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const [formState, setFormState] = useState(initialFormState);
+  // The stored type_company stays in Spanish; only the label is translated.
+  const options = [
+    {id: 'Juridica', name: t.legalEntity},
+    {id: 'Natural', name: t.naturalPerson},
+  ];
   const [typeCompany, setTypeCompany] = useState('');
 console.log(formState)
   const handleChange = (name: any, value: any) => {
@@ -150,7 +151,7 @@ console.log(formState)
             textButton={t.companyType}
             items={options}
             onSelect={value => {
-              setTypeCompany(value.name);
+              setTypeCompany(value.id);
             }}
           />
           <CustomInput

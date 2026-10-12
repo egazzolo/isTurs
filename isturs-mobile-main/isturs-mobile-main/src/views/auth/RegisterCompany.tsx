@@ -21,6 +21,7 @@ import {showToast} from '../../redux/slices/toast.slice';
 import Alert from '../../services/Alert';
 import {useNavigation} from '@react-navigation/native';
 import FullScreenLoader from '../../components/UI/FullScreenLoader';
+import {useTranslation} from '../../i18n';
 
 interface RegisterResponse {
   name: string;
@@ -32,11 +33,6 @@ interface RegisterResponse {
   role: string;
   id: string;
 }
-
-const options = [
-  {id: '1', name: 'Juridica'},
-  {id: '2', name: 'Natural'},
-];
 
 const areAllFieldsFilled = (state: any) => {
   const requiredFields = [
@@ -66,6 +62,12 @@ const initialFormState = {
 export default function RegisterCompany() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
+  const {t} = useTranslation();
+  // The stored type_company stays in Spanish; only the label is translated.
+  const options = [
+    {id: 'Juridica', name: t.legalEntity},
+    {id: 'Natural', name: t.naturalPerson},
+  ];
   const [formState, setFormState] = useState(initialFormState);
   const [typeCompany, setTypeCompany] = useState('');
 
@@ -78,7 +80,7 @@ export default function RegisterCompany() {
 
   const {postData, data, isLoading, error} = usePost<RegisterResponse>({
     onSuccess: () => {
-      Alert.success('!Registro exitoso!');
+      Alert.success(t.registerSuccess);
       navigation.goBack();
       setFormState(initialFormState);
     },
@@ -92,20 +94,20 @@ export default function RegisterCompany() {
 
   const handleSubmmit = () => {
     // Verificar si todos los campos están llenos.
-    if (!areAllFieldsFilled(formState)) {
-      Alert.info('Todos los campos son obligatorios');
+    if (!areAllFieldsFilled(formState) || !typeCompany) {
+      Alert.info(t.allFieldsRequired);
       return;
     }
 
     // Verificar si las contraseñas coinciden.
     if (formState.password !== formState.confirmPassword) {
-      Alert.info('Las contraseñas no coinciden');
+      Alert.info(t.passwordsDoNotMatch);
       return;
     }
 
     // Verificar si los términos y condiciones están aceptados.
     if (!formState.isChecked) {
-      Alert.info('Debes aceptar los términos y condiciones');
+      Alert.info(t.acceptTerms);
       return;
     }
 
@@ -114,7 +116,9 @@ export default function RegisterCompany() {
       role: 'COMPANY',
       name: formState.companyName,
       type_company: typeCompany,
-      company: formState.socialReason,
+      company_name: formState.socialReason,
+      ruc: formState.ruc,
+      phone: formState.cellphone,
       username: formState.username,
       password: formState.password,
     });
@@ -125,55 +129,55 @@ export default function RegisterCompany() {
       <Background xml={AppImages.BACKGROUND} darkOverlay />
       <View style={styles.container}>
         <View style={styles.titleContainer}>
-          <Text style={styles.textTitle}>Registro</Text>
-          <Text style={styles.textRole}>Empresa</Text>
+          <Text style={styles.textTitle}>{t.registrationTitle}</Text>
+          <Text style={styles.textRole}>{t.companyRole}</Text>
         </View>
         <View style={styles.overlayContent}>
           <CustomInput
-            placeholder="Nombre Comercial"
+            placeholder={t.tradeName}
             onChangeText={value => handleChange('companyName', value)}
           />
           <CustomInput
-            placeholder="Razón Social"
+            placeholder={t.legalName}
             onChangeText={value => handleChange('socialReason', value)}
           />
           <CustomInput
-            placeholder="RUC"
+            placeholder={t.taxId}
             onChangeText={value => handleChange('ruc', value)}
           />
           <CustomInput
-            placeholder="Celular"
+            placeholder={t.mobilePhone}
             onChangeText={value => handleChange('cellphone', value)}
             keyboardType="numeric"
           />
           <CustomSelectBottomSheet
-            textButton={'Tipo de Empresa'}
+            textButton={t.companyType}
             items={options}
             onSelect={value => {
-              setTypeCompany(value.name);
+              setTypeCompany(value.id);
             }}
           />
           <CustomInput
-            placeholder="Nombre de Usuario"
+            placeholder={t.username}
             onChangeText={value => handleChange('username', value)}
           />
           <CustomInput
-            placeholder="Contraseña"
+            placeholder={t.password}
             isSecure={true}
             onChangeText={value => handleChange('password', value)}
           />
           <CustomInput
-            placeholder="Confirmar Contraseña"
+            placeholder={t.confirmPassword}
             isSecure={true}
             onChangeText={value => handleChange('confirmPassword', value)}
           />
 
           <CustomCheckbox
-            label="Acepto los términos y condiciones"
+            label={t.termsAndConditions}
             checked={formState.isChecked}
             onCheck={() => handleChange('isChecked', !formState.isChecked)}
           />
-          <CustomButton title="Regístrate" onPress={() => handleSubmmit()} />
+          <CustomButton title={t.register} onPress={() => handleSubmmit()} />
         </View>
       </View>
       <FullScreenLoader visible={isLoading}/>

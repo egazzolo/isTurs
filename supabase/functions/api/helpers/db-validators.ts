@@ -32,7 +32,8 @@ export const rucExist = async (ruc: string) => {
 
 export const codeExist = async (code: string) => {
   if (!code) return true
-  const { data } = await supabase.from('profiles').select('id').eq('code', code).single()
+  // Operators share their company's code, so match the company row only.
+  const { data } = await supabase.from('profiles').select('id').eq('code', code).eq('role', 'COMPANY').maybeSingle()
   if (!data) throw new Error(`El Codigo ${code} no existe`)
   return true
 }

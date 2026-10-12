@@ -136,13 +136,13 @@ export default function RegisterTurist() {
               onChangeText={value => handleChange('email', value)}
             />
             <CustomInput
-              placeholder="Celular"
+              placeholder={t.mobilePhone}
               onChangeText={value => handleChange('phone', value)}
               keyboardType="numeric"
             />
 
             <CustomInput
-              placeholder="Nombre de Usuario"
+              placeholder={t.username}
               onChangeText={value => handleChange('username', value)}
             />
             <CustomInput
@@ -157,11 +157,11 @@ export default function RegisterTurist() {
             />
 
             <CustomCheckbox
-              label="Acepto los términos y condiciones"
+              label={t.termsAndConditions}
               checked={formState.isChecked}
               onCheck={() => handleChange('isChecked', !formState.isChecked)}
             />
-            <CustomButton title="Regístrate" onPress={() => handleSubmmit()} />
+            <CustomButton title={t.register} onPress={() => handleSubmmit()} />
           </View>
         </View>
       <FullScreenLoader visible={isLoading}/>

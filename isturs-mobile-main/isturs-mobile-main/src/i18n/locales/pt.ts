@@ -128,6 +128,12 @@ const pt = {
   enterDestination: 'Insira o local de destino',
   operationSuccess: 'Operação bem-sucedida',
   newMessages: 'novas mensagens',
+  tradeName: 'Nome fantasia',
+  legalName: 'Razão social',
+  taxId: 'RUC',
+  mobilePhone: 'Celular',
+  legalEntity: 'Pessoa jurídica',
+  naturalPerson: 'Pessoa física',
 };
 
 export default pt;

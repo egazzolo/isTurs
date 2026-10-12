@@ -128,6 +128,12 @@ const en = {
   enterDestination: 'Enter destination',
   operationSuccess: 'Operation successful',
   newMessages: 'new messages',
+  tradeName: 'Trade name',
+  legalName: 'Legal name',
+  taxId: 'RUC (tax ID)',
+  mobilePhone: 'Mobile phone',
+  legalEntity: 'Legal entity',
+  naturalPerson: 'Individual',
 };
 
 export default en;
