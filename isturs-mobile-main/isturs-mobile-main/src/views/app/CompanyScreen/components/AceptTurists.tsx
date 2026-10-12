@@ -149,7 +149,7 @@ export default function AceptTurists({turista,setSelectedTurista,refreshData}: a
         <Box>
           <Text style={styles.textStyle}>{t.originPlace}</Text>
           <CustomInput
-            placeholder={t.enterDestination}
+            placeholder={t.enterOrigin}
             value={formState.origen}
             onChangeText={text => handleInputChange('origen', text)}
           />
@@ -158,7 +158,7 @@ export default function AceptTurists({turista,setSelectedTurista,refreshData}: a
         <Box>
           <Text style={styles.textStyle}>{t.destinationPlace}</Text>
           <CustomInput
-            placeholder={t.enterOrigin}
+            placeholder={t.enterDestination}
             value={formState.destino}
             onChangeText={text => handleInputChange('destino', text)}
           />
