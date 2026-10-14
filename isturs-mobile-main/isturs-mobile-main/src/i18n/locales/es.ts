@@ -135,6 +135,8 @@ const es = {
   legalEntity: 'Jurídica',
   naturalPerson: 'Natural',
   done: 'Listo',
+  takePhoto: 'Tomar foto',
+  chooseFromGallery: 'Elegir de la galería',
 };
 
 export default es;

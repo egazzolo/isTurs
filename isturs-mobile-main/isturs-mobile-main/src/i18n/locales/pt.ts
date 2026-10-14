@@ -135,6 +135,8 @@ const pt = {
   legalEntity: 'Pessoa jurídica',
   naturalPerson: 'Pessoa física',
   done: 'Concluído',
+  takePhoto: 'Tirar foto',
+  chooseFromGallery: 'Escolher da galeria',
 };
 
 export default pt;

@@ -3,7 +3,20 @@ import { View, FlatList, Text, TextInput, TouchableOpacity, Image, StyleSheet, A
 import axiosClient from '../../../../api';
 import {useTranslation} from '../../../../i18n';
 import {KEYBOARD_DONE_ID} from '../../../../components/KeyboardDoneBar/KeyboardDoneBar';
-import {launchImageLibrary} from 'react-native-image-picker';
+import {
+  launchCamera,
+  launchImageLibrary,
+  CameraOptions,
+  ImagePickerResponse,
+} from 'react-native-image-picker';
+
+const photoOptions: CameraOptions = {
+  mediaType: 'photo',
+  includeBase64: true,
+  quality: 0.7,
+  maxWidth: 1600,
+  maxHeight: 1600,
+};
 import messaging from '@react-native-firebase/messaging';
 
 const Chat = ({data}: any) => {
@@ -73,38 +86,46 @@ const Chat = ({data}: any) => {
     }
   };
 
-  const sendPhoto = async () => {
-    launchImageLibrary(
-      {mediaType: 'photo', includeBase64: true, quality: 0.7},
-      async response => {
-        if (response.didCancel || response.errorCode) return;
-        const asset = response.assets?.[0];
-        if (!asset?.base64) return;
-        try {
-          const base64Image = `data:image/jpeg;base64,${asset.base64}`;
-
-          // Upload to Supabase via backend
-          const uploadResponse = await axiosClient.post(
-            '/uphold/uploadChatImage',
-            {
-              image: base64Image,
-            },
-          );
-
-          const imageUrl = uploadResponse.data?.imageUrl;
-          if (imageUrl) {
-            await axiosClient.post('/chats/createMessage', {
-              chatId,
-              text: '',
-              imageUrl,
-            });
-            fetchMessages();
-          }
-        } catch (error) {
-          console.error('Error sending photo:', error);
-        }
+  const sendPhoto = () => {
+    RNAlert.alert(t.photo, undefined, [
+      {text: t.takePhoto, onPress: () => launchCamera(photoOptions, uploadPhoto)},
+      {
+        text: t.chooseFromGallery,
+        onPress: () => launchImageLibrary(photoOptions, uploadPhoto),
       },
-    );
+      {text: t.cancel, style: 'cancel'},
+    ]);
+  };
+
+  const uploadPhoto = async (response: ImagePickerResponse) => {
+    if (response.didCancel || response.errorCode) return;
+    const asset = response.assets?.[0];
+    if (!asset?.base64) return;
+    try {
+      const base64Image = `data:image/jpeg;base64,${asset.base64}`;
+
+      // Upload to Supabase via backend
+      const uploadResponse = await axiosClient.post(
+        '/uphold/uploadChatImage',
+        {
+          image: base64Image,
+        },
+        // photos on a slow mobile connection can take longer than the default timeout
+        {timeout: 60000},
+      );
+
+      const imageUrl = uploadResponse.data?.imageUrl;
+      if (imageUrl) {
+        await axiosClient.post('/chats/createMessage', {
+          chatId,
+          text: '',
+          imageUrl,
+        });
+        fetchMessages();
+      }
+    } catch (error) {
+      console.error('Error sending photo:', error);
+    }
   };
 
   const handleChatVisible = () => {
