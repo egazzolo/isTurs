@@ -15,9 +15,9 @@ export const generarJWT = (uid = '') => {
   })
 }
 
-export const verificarJWT = (token: string) => {
+export const verificarJWT = (token: string, options: { ignoreExpiration?: boolean } = {}) => {
   return new Promise<any>((resolve, reject) => {
-    jwt.verify(token, secret(), (err: any, decoded: any) => {
+    jwt.verify(token, secret(), options, (err: any, decoded: any) => {
       if (err) {
         reject('Token no válido')
       } else {

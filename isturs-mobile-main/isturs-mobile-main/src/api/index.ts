@@ -5,6 +5,8 @@ import store from '../redux/store';
 
 const defaultOptions = {
   baseURL: API_URL,
+  // Never leave a loader spinning forever on a stuck request.
+  timeout: 20000,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -29,7 +31,15 @@ axiosClient.interceptors.response.use(
   async error => {
     const originalRequest = error.config;
 
-    if (error.response && error.response.status === 401 && !originalRequest._retry) {
+    // A failed refresh must not trigger another refresh, or it loops forever.
+    const isRefreshCall = originalRequest?.url?.includes('/auth/refreshToken');
+
+    if (
+      error.response &&
+      error.response.status === 401 &&
+      !originalRequest._retry &&
+      !isRefreshCall
+    ) {
       originalRequest._retry = true; // Mark this request as retried
 
       try {

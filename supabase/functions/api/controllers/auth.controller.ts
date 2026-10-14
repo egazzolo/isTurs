@@ -36,7 +36,11 @@ export const refreshToken = async (req: any, res: any) => {
   const { token } = req.body
 
   try {
-    const { uid } = await verificarJWT(token)
+    // Expired tokens may be renewed, as long as they were issued within the last 30 days.
+    const { uid, iat } = await verificarJWT(token, { ignoreExpiration: true })
+    if (!iat || Date.now() / 1000 - iat > 30 * 24 * 60 * 60) {
+      return res.status(401).json({ msg: 'Token no válido o expirado' })
+    }
 
     const { data: usuario, error } = await supabase
       .from('profiles')
